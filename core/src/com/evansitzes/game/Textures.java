@@ -11,6 +11,19 @@ public class Textures {
 
     public static class Sidebar {
         public static final TextureRegion SIDEBAR = loadSidebar();
+        public static final TextureRegion HOUSE = loadHouse()[0][0];
+
+    }
+
+    public static class Colors {
+        public static final TextureRegion RED = loadRed()[0][0];
+
+        private static TextureRegion[][] loadRed() {
+            final int frameColumns = 1;
+            final int frameRows = 1;
+
+            return splitTextureRegion(frameColumns, frameRows, new Texture(Gdx.files.internal("colors/red.png")));
+        }
 
     }
 
@@ -19,6 +32,14 @@ public class Textures {
         final int frameRows = 1;
 
         return splitTextureRegion(frameColumns, frameRows, new Texture(Gdx.files.internal("sidebar/sidebar.png")))[0][0];
+
+    }
+
+    private static TextureRegion[][] loadHouse() {
+        final int frameColumns = 24;
+        final int frameRows = 30;
+
+        return splitTextureRegion(frameColumns, frameRows, new Texture(Gdx.files.internal("buildings/build.png")));
 
     }
 

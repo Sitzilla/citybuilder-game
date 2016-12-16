@@ -74,6 +74,6 @@ public class TmxLevelLoader {
     private static TiledMap loadMap(final String zone) {
         final String resource = "maps/" + zone + ".tmx";
         final TmxMapLoader tmxMapLoader = new TmxMapLoader(new InternalFileHandleResolver());
-        return tmxMapLoader.load(resource);
+         return tmxMapLoader.load(resource);
     }
 }
