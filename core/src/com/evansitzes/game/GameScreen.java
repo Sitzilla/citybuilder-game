@@ -17,6 +17,9 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.evansitzes.game.buildings.Building;
+
+import java.util.ArrayList;
 
 
 /**
@@ -51,6 +54,8 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
     private int currentMouseY;
     private int currentTileX;
     private int currentTileY;
+
+    private final ArrayList<Building> buildings = new ArrayList<Building>();
 
     private final CityBuildingGame game;
     private final GameflowController gameflowController;
@@ -130,17 +135,21 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
 
         game.batch.begin();
 
-        // TODO refactor
-        // - global variable modification
-        setCornerTileFromMiddleArea(currentMouseX, currentMouseY, 6);
-        drawTileBorder(currentTileX, currentTileY, 6);
-
         if (buildingSelected) {
+            // TODO refactor
+            // - global variable modification
+            setCornerTileFromMiddleArea(currentMouseX, currentMouseY, 2);
+            drawTileBorder(currentTileX, currentTileY, 2);
+            
             selectedBuilding.draw(game.batch,
                                     buildingX,
                                     buildingY,
                                     level.tileWidth * Configuration.WIDTH_MODIFIER * 2,
                                     level.tileHeight * Configuration.HEIGHT_MODIFIER * 2);
+        }
+
+        for (final Building building : buildings) {
+            building.draw();
         }
 
         game.batch.end();
@@ -184,6 +193,12 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
             System.out.println(screenX);
             System.out.println(Gdx.graphics.getHeight() - screenY);
 
+            if (buildingSelected) {
+                Building building = new Building(game);
+                building.x = currentTileX;
+                building.y = currentTileY;
+                buildings.add(building);
+            }
         }
 
         return false;
