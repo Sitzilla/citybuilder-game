@@ -15,6 +15,13 @@ public class Textures {
 
     }
 
+    public static class Road {
+        public static final TextureRegion VERTICLE_ROAD = loadRoad()[3][5];
+        public static final TextureRegion HORIZONTAL_ROAD = loadRoad()[0][0];
+
+    }
+
+
     public static class Colors {
         public static final TextureRegion RED = loadRed()[0][0];
 
@@ -31,8 +38,7 @@ public class Textures {
         final int frameColumns = 1;
         final int frameRows = 1;
 
-        return splitTextureRegion(frameColumns, frameRows, new Texture(Gdx.files.internal("sidebar/sidebar.png")))[0][0];
-
+        return splitTextureRegion(frameColumns, frameRows, new Texture(Gdx.files.internal("sidebar/demo_sidebar.png")))[0][0];
     }
 
     private static TextureRegion[][] loadHouse() {
@@ -40,7 +46,13 @@ public class Textures {
         final int frameRows = 30;
 
         return splitTextureRegion(frameColumns, frameRows, new Texture(Gdx.files.internal("buildings/build.png")));
+    }
 
+    private static TextureRegion[][] loadRoad() {
+        final int frameColumns = 9;
+        final int frameRows = 9;
+
+        return splitTextureRegion(frameColumns, frameRows, new Texture(Gdx.files.internal("sidebar/road_and_grass.png")));
     }
 
     private static TextureRegion[][] splitTextureRegion(final int columns, final int rows, final Texture sheet) {

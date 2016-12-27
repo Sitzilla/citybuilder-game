@@ -1,8 +1,9 @@
-package com.evansitzes.game;
+package com.evansitzes.game.environment;
 
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Event;
+import com.evansitzes.game.CityBuildingGame;
 
 import java.util.ArrayList;
 import java.util.List;
