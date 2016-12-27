@@ -1,4 +1,4 @@
-package com.evansitzes.game;
+package com.evansitzes.game.environment;
 
 /**
  * Created by evan on 12/27/16.

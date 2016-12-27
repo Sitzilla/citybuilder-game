@@ -1,4 +1,6 @@
-package com.evansitzes.game;
+package com.evansitzes.game.environment;
+
+import com.evansitzes.game.Configuration;
 
 import java.util.ArrayList;
 

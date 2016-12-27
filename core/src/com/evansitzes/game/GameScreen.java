@@ -18,6 +18,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.evansitzes.game.buildings.Building;
+import com.evansitzes.game.environment.Level;
+import com.evansitzes.game.environment.MapTiles;
 
 import java.util.ArrayList;
 
