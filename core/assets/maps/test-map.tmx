@@ -3,9 +3,12 @@
  <tileset firstgid="1" name="terrain" tilewidth="32" tileheight="32" tilecount="256" columns="16">
   <image source="image.png" trans="000000" width="512" height="512"/>
  </tileset>
+ <tileset firstgid="257" name="roads" tilewidth="32" tileheight="32" tilecount="324" columns="18">
+  <image source="../sidebar/road_and_grass.png" trans="000000" width="576" height="576"/>
+ </tileset>
  <layer name="Tile Layer 1" width="32" height="32">
   <data encoding="base64" compression="zlib">
-   eJztwwEJAAAMBKHrn+HDrsdQcNVUVVXV1w8U2nAf
+   eJztlEsKwjAQhusBfNzAxwX0CrpVu9Gtj41eQC2kF2ihHrr/woEhaK0ZmQjO4uNPpoTkS4a6TpLkwD3I2Vwr/dodVIpJ4xj+fP/Kq8fw13z3X/PX7nvu7/eglr97sf+/+N9AxqD5GqQtzr8EK4F/AUoGzQ/g2OL8O7D/gr+fF3Bt+E65AdsndRo3kTHf0DyBM0t+n8UbSsG7UU7BDPTBIGC9tH/nYAHGYBKwXurfBT3Beqk/7S/5/5m/+Zu/+Zv/5zkEo4j+0pT6SzO2fw2sVPwQ
   </data>
  </layer>
 </map>

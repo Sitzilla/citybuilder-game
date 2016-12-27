@@ -1,11 +1,11 @@
 package com.evansitzes.game.buildings;
 
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
 import com.evansitzes.game.CityBuildingGame;
 import com.evansitzes.game.Configuration;
-import com.evansitzes.game.Textures;
 
 /**
  * Created by evan on 12/14/16.
@@ -17,12 +17,14 @@ public class Building extends Rectangle {
     public Sprite sprite;
     public final Vector3 position = new Vector3();
     public Rectangle rectangle;
+    public int tileSize;
 
-    public Building(final CityBuildingGame game) {
+    public Building(final CityBuildingGame game, final TextureRegion buildingSprite, final int tileSize) {
         this.game = game;
         rectangle = new Rectangle();
-        sprite = new Sprite(Textures.Sidebar.HOUSE);
-        sprite.setSize(Configuration.WIDTH_MODIFIER * 32 * 2, Configuration.HEIGHT_MODIFIER * 32 * 2);
+        sprite = new Sprite(buildingSprite);
+        this.tileSize = tileSize;
+        sprite.setSize(Configuration.WIDTH_MODIFIER * 32 * tileSize, Configuration.HEIGHT_MODIFIER * 32 * tileSize);
     }
 
 //    public boolean overlaps(final Entity entity) {

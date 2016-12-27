@@ -39,7 +39,7 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
     private TextureRegion sidebar;
     private TextureRegionDrawable sidebarDrawable;
 
-    private TextureRegionDrawable selectedBuilding;
+    private TextureRegionDrawable selectedBuildingImage;
     private float buildingX;
     private float buildingY;
 
@@ -50,6 +50,7 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
     Label fpsLabel;
 
     private boolean buildingSelected;
+    private int currentImageTilesize; //TODO replace with building object maybe?
     private int currentMouseX;
     private int currentMouseY;
     private int currentTileX;
@@ -85,28 +86,42 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
 
         sidebar = Textures.Sidebar.SIDEBAR;
         sidebarDrawable = new TextureRegionDrawable(sidebar);
-        selectedBuilding = new TextureRegionDrawable((Textures.Sidebar.HOUSE));
 
-        Button imgButton = new Button(new Image(Textures.Sidebar.HOUSE), skin);
-//        imgButton.setWidth(500);
-//        imgButton.setHeight(500);
+        final Button imgButton = new Button(new Image(Textures.Sidebar.HOUSE), skin);
+        final Button roadButton = new Button(new Image(Textures.Road.VERTICLE_ROAD), skin);
+
+        roadButton.setWidth(TILE_SIZE * Configuration.WIDTH_MODIFIER);
+        roadButton.setHeight(TILE_SIZE * Configuration.HEIGHT_MODIFIER);
+
         imgButton.addListener(new ClickListener() {
             @Override
-            public void clicked(InputEvent event, float x, float y) {
+            public void clicked(final InputEvent event, final float x, final float y) {
+                currentImageTilesize = 2;
+                selectedBuildingImage = new TextureRegionDrawable((Textures.Sidebar.HOUSE));
                 buildingSelected = true;
             }
         });
 
-        final Label nameLabel = new Label("Name:", skin);
-        final TextField nameText = new TextField("", skin);
-        final Label addressLabel = new Label("Address:", skin);
-        final TextField addressText = new TextField("", skin);
+        roadButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(final InputEvent event, final float x, final float y) {
+                currentImageTilesize = 1;
+                selectedBuildingImage = new TextureRegionDrawable((Textures.Road.VERTICLE_ROAD));
+                buildingSelected = true;
+            }
+        });
+
+//        final Label nameLabel = new Label("Name:", skin);
+//        final TextField nameText = new TextField("", skin);
+//        final Label addressLabel = new Label("Address:", skin);
+//        final TextField addressText = new TextField("", skin);
 
         final Table table = new Table();
 //        table.setFillParent(true);
         table.setBackground(sidebarDrawable);
 
         table.add(imgButton);
+        table.add(roadButton);
 
         table.setDebug(true); // turn on all debug lines (table, cell, and widget)
         table.setHeight(h);
@@ -138,14 +153,14 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
         if (buildingSelected) {
             // TODO refactor
             // - global variable modification
-            setCornerTileFromMiddleArea(currentMouseX, currentMouseY, 2);
-            drawTileBorder(currentTileX, currentTileY, 2);
-            
-            selectedBuilding.draw(game.batch,
+            setCornerTileFromMiddleArea(currentMouseX, currentMouseY, currentImageTilesize);
+            drawTileBorder(currentTileX, currentTileY, currentImageTilesize);
+
+            selectedBuildingImage.draw(game.batch,
                                     buildingX,
                                     buildingY,
-                                    level.tileWidth * Configuration.WIDTH_MODIFIER * 2,
-                                    level.tileHeight * Configuration.HEIGHT_MODIFIER * 2);
+                                    level.tileWidth * Configuration.WIDTH_MODIFIER * currentImageTilesize,
+                                    level.tileHeight * Configuration.HEIGHT_MODIFIER * currentImageTilesize);
         }
 
         for (final Building building : buildings) {
@@ -194,7 +209,7 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
             System.out.println(Gdx.graphics.getHeight() - screenY);
 
             if (buildingSelected) {
-                Building building = new Building(game);
+                final Building building = new Building(game, selectedBuildingImage.getRegion(), currentImageTilesize);
                 building.x = currentTileX;
                 building.y = currentTileY;
                 buildings.add(building);
@@ -216,8 +231,9 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
 
     @Override
     public boolean mouseMoved(final int screenX, final int screenY) {
-            buildingX = screenX - 50;
-            buildingY = Gdx.graphics.getHeight() - screenY - 50;
+        //TODO magic numbers
+            buildingX = screenX - 25 * currentImageTilesize;
+            buildingY = Gdx.graphics.getHeight() - screenY - 25 * currentImageTilesize;
 
 //            if (buildingSelected) {
                 currentMouseX = screenX;
@@ -242,7 +258,7 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
 
     }
 
-    private void setCornerTileFromMiddleArea(final int screenX, final int screenY, int numberOfTiles) {
+    private void setCornerTileFromMiddleArea(final int screenX, final int screenY, final int numberOfTiles) {
 
         // tile group has a definite tile as the center
         if (numberOfTiles % 2 != 0) {
