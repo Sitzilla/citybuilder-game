@@ -27,7 +27,7 @@ import java.util.ArrayList;
  */
 public class GameScreen extends ApplicationAdapter implements Screen, InputProcessor {
 
-    private static int BORDER_WIDTH = 10;
+    private static int BORDER_WIDTH = 3;
     private static int TILE_SIZE;
 
     private Texture img;
@@ -35,6 +35,7 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
     private OrthographicCamera camera;
     private TiledMapRenderer tiledMapRenderer;
     private Level level;
+    private MapTiles mapTiles;
 
     private TextureRegion sidebar;
     private TextureRegionDrawable sidebarDrawable;
@@ -57,6 +58,9 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
     private int currentTileY;
 
     private final ArrayList<Building> buildings = new ArrayList<Building>();
+//    private final ArrayList<Tile> mapTiles = new ArrayList<Tile>();
+//    private final TreeSet<Integer> developedXTiles = new TreeSet<Integer>();
+//    private final TreeSet<Integer> developedYTiles = new TreeSet<Integer>();
 
     private final CityBuildingGame game;
     private final GameflowController gameflowController;
@@ -78,6 +82,8 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
 //        tiledMap = new TmxMapLoader().load("maps/basic-level1.tmx");
         this.level = TmxLevelLoader.load(Vector2.Zero, game, this, "test-map");
         TILE_SIZE = (int) (level.tileHeight * Configuration.WIDTH_MODIFIER);
+
+        mapTiles = new MapTiles(w, h, level.tileHeight, level.tileWidth);
 
         this.tiledMapRenderer = new OrthogonalTiledMapRenderer(level.map);
         tiledMapRenderer.setView(camera);
@@ -157,8 +163,8 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
             drawTileBorder(currentTileX, currentTileY, currentImageTilesize);
 
             selectedBuildingImage.draw(game.batch,
-                                    buildingX,
-                                    buildingY,
+                                    currentTileX,
+                                    currentTileY,
                                     level.tileWidth * Configuration.WIDTH_MODIFIER * currentImageTilesize,
                                     level.tileHeight * Configuration.HEIGHT_MODIFIER * currentImageTilesize);
         }
@@ -208,11 +214,13 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
             System.out.println(screenX);
             System.out.println(Gdx.graphics.getHeight() - screenY);
 
-            if (buildingSelected) {
+            if (buildingSelected && !isPlacementAreaOccupied()) {
                 final Building building = new Building(game, selectedBuildingImage.getRegion(), currentImageTilesize);
                 building.x = currentTileX;
                 building.y = currentTileY;
+
                 buildings.add(building);
+                setDevelopedTiles();
             }
         }
 
@@ -231,14 +239,14 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
 
     @Override
     public boolean mouseMoved(final int screenX, final int screenY) {
-        //TODO magic numbers
-            buildingX = screenX - 25 * currentImageTilesize;
-            buildingY = Gdx.graphics.getHeight() - screenY - 25 * currentImageTilesize;
 
-//            if (buildingSelected) {
-                currentMouseX = screenX;
-                currentMouseY = Gdx.graphics.getHeight() - screenY;
-//            }
+        //TODO magic numbers
+        // Not currently used... can use later when wanting to tie an image to the mouse
+//            buildingX = screenX - 25 * currentImageTilesize;
+//            buildingY = Gdx.graphics.getHeight() - screenY - 25 * currentImageTilesize;
+
+            currentMouseX = screenX;
+            currentMouseY = Gdx.graphics.getHeight() - screenY;
 
         return false;
     }
@@ -256,6 +264,30 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
     @Override
     public void hide() {
 
+    }
+
+    private void setDevelopedTiles() {
+
+        for (int i = 0; i < currentImageTilesize; i++) {
+            for (int j = 0; j < currentImageTilesize; j++) {
+                mapTiles.getTile(currentTileX / TILE_SIZE + i, currentTileY / TILE_SIZE + j).setOccupied(true);
+            }
+        }
+
+    }
+
+
+    private boolean isPlacementAreaOccupied() {
+
+        for (int i = 0; i < currentImageTilesize; i++) {
+            for (int j = 0; j < currentImageTilesize; j++) {
+                if (mapTiles.getTile(currentTileX / TILE_SIZE + i, currentTileY / TILE_SIZE + j).isOccupied()) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     private void setCornerTileFromMiddleArea(final int screenX, final int screenY, final int numberOfTiles) {
