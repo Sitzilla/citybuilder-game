@@ -6,6 +6,7 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
 import com.evansitzes.game.CityBuildingGame;
 import com.evansitzes.game.Configuration;
+import com.evansitzes.game.Textures;
 
 /**
  * Created by evan on 12/14/16.
@@ -19,12 +20,13 @@ public class Building extends Rectangle {
     public Rectangle rectangle;
     public int tileSize;
 
-    public Building(final CityBuildingGame game, final TextureRegion buildingSprite, final int tileSize) {
+    public Building(final CityBuildingGame game, final int tileSize, final String name) {
         this.game = game;
         rectangle = new Rectangle();
-        sprite = new Sprite(buildingSprite);
+        sprite = new Sprite(getBuildingSprite(name));
         this.tileSize = tileSize;
         sprite.setSize(Configuration.WIDTH_MODIFIER * 32 * tileSize, Configuration.HEIGHT_MODIFIER * 32 * tileSize);
+        this.name = name;
     }
 
 //    public boolean overlaps(final Entity entity) {
@@ -54,4 +56,19 @@ public class Building extends Rectangle {
     }
 
     public void setSpritesPositions() {}
+
+    //TODO replace this with some kind of configuration lookup
+    private TextureRegion getBuildingSprite(final String name) {
+        if (name.equals("house")) {
+            return Textures.Sidebar.HOUSE;
+        }
+
+        if (name.equals("road")) {
+            return Textures.Road.VERTICLE_ROAD;
+        }
+
+        //TODO should throw an error
+        return null;
+    }
+
 }

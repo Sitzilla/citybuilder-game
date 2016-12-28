@@ -19,7 +19,8 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.evansitzes.game.buildings.Building;
 import com.evansitzes.game.environment.Level;
-import com.evansitzes.game.environment.MapTiles;
+import com.evansitzes.game.environment.TilesMap;
+import com.evansitzes.game.state.StateHelper;
 
 import java.util.ArrayList;
 
@@ -37,7 +38,7 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
     private OrthographicCamera camera;
     private TiledMapRenderer tiledMapRenderer;
     private Level level;
-    private MapTiles mapTiles;
+    private TilesMap tilesMap;
 
     private TextureRegion sidebar;
     private TextureRegionDrawable sidebarDrawable;
@@ -53,14 +54,16 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
     Label fpsLabel;
 
     private boolean buildingSelected;
-    private int currentImageTilesize; //TODO replace with building object maybe?
+    //TODO replace with building object maybe?
+    private String currentBuildingName;
+    private int currentImageTilesize;
     private int currentMouseX;
     private int currentMouseY;
     private int currentTileX;
     private int currentTileY;
 
-    private final ArrayList<Building> buildings = new ArrayList<Building>();
-//    private final ArrayList<Tile> mapTiles = new ArrayList<Tile>();
+    private final ArrayList<Building> buildings;
+//    private final ArrayList<Tile> tilesMap = new ArrayList<Tile>();
 //    private final TreeSet<Integer> developedXTiles = new TreeSet<Integer>();
 //    private final TreeSet<Integer> developedYTiles = new TreeSet<Integer>();
 
@@ -85,7 +88,10 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
         this.level = TmxLevelLoader.load(Vector2.Zero, game, this, "test-map");
         TILE_SIZE = (int) (level.tileHeight * Configuration.WIDTH_MODIFIER);
 
-        mapTiles = new MapTiles(w, h, level.tileHeight, level.tileWidth);
+        // Load State
+        buildings = StateHelper.loadBuildingsState(game);
+        tilesMap = StateHelper.loadTilesState(w, h, level.tileHeight, level.tileWidth);
+//        tilesMap = new TilesMap(w, h, level.tileHeight, level.tileWidth);
 
         this.tiledMapRenderer = new OrthogonalTiledMapRenderer(level.map);
         tiledMapRenderer.setView(camera);
@@ -95,6 +101,7 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
         sidebar = Textures.Sidebar.SIDEBAR;
         sidebarDrawable = new TextureRegionDrawable(sidebar);
 
+        final TextButton saveButton = new TextButton("Save", skin);
         final Button imgButton = new Button(new Image(Textures.Sidebar.HOUSE), skin);
         final Button roadButton = new Button(new Image(Textures.Road.VERTICLE_ROAD), skin);
 
@@ -105,6 +112,7 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
             @Override
             public void clicked(final InputEvent event, final float x, final float y) {
                 currentImageTilesize = 2;
+                currentBuildingName = "house";
                 selectedBuildingImage = new TextureRegionDrawable((Textures.Sidebar.HOUSE));
                 buildingSelected = true;
             }
@@ -114,8 +122,18 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
             @Override
             public void clicked(final InputEvent event, final float x, final float y) {
                 currentImageTilesize = 1;
+                currentBuildingName = "road";
                 selectedBuildingImage = new TextureRegionDrawable((Textures.Road.VERTICLE_ROAD));
                 buildingSelected = true;
+            }
+        });
+
+        saveButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(final InputEvent event, final float x, final float y) {
+                System.out.println("Saving!");
+                StateHelper.saveBuildingsState(buildings);
+                StateHelper.saveTilesState(tilesMap);
             }
         });
 
@@ -130,6 +148,7 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
 
         table.add(imgButton);
         table.add(roadButton);
+        table.add(saveButton);
 
         table.setDebug(true); // turn on all debug lines (table, cell, and widget)
         table.setHeight(h);
@@ -217,7 +236,7 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
             System.out.println(Gdx.graphics.getHeight() - screenY);
 
             if (buildingSelected && !isPlacementAreaOccupied()) {
-                final Building building = new Building(game, selectedBuildingImage.getRegion(), currentImageTilesize);
+                final Building building = new Building(game, currentImageTilesize, currentBuildingName);
                 building.x = currentTileX;
                 building.y = currentTileY;
 
@@ -272,7 +291,7 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
 
         for (int i = 0; i < currentImageTilesize; i++) {
             for (int j = 0; j < currentImageTilesize; j++) {
-                mapTiles.getTile(currentTileX / TILE_SIZE + i, currentTileY / TILE_SIZE + j).setOccupied(true);
+                tilesMap.getTile(currentTileX / TILE_SIZE + i, currentTileY / TILE_SIZE + j).setOccupied(true);
             }
         }
 
@@ -283,7 +302,7 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
 
         for (int i = 0; i < currentImageTilesize; i++) {
             for (int j = 0; j < currentImageTilesize; j++) {
-                if (mapTiles.getTile(currentTileX / TILE_SIZE + i, currentTileY / TILE_SIZE + j).isOccupied()) {
+                if (tilesMap.getTile(currentTileX / TILE_SIZE + i, currentTileY / TILE_SIZE + j).isOccupied()) {
                     return true;
                 }
             }
