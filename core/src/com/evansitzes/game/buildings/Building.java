@@ -71,4 +71,12 @@ public class Building extends Rectangle {
         return null;
     }
 
+    public boolean overhangs(int cornerX, int cornerY) {
+        //TODO magic numbers
+        return cornerX >= x
+            && cornerX < x + 32 * Configuration.WIDTH_MODIFIER * tileSize
+            && cornerY >= y
+            && cornerY < y + 32 * Configuration.HEIGHT_MODIFIER * tileSize;
+
+    }
 }

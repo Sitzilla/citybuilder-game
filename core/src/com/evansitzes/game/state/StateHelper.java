@@ -3,6 +3,7 @@ package com.evansitzes.game.state;
 import com.badlogic.gdx.Gdx;
 import com.evansitzes.game.CityBuildingGame;
 import com.evansitzes.game.buildings.Building;
+import com.evansitzes.game.environment.Tile;
 import com.evansitzes.game.environment.TilesMap;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
@@ -104,9 +105,8 @@ public class StateHelper {
 
         try {
             final File file = new File(String.valueOf(Gdx.files.local("state/tiles.yml")));
-            final TilesEnvelope tilesEnvelope = mapper.readValue(file, TilesEnvelope.class);
-
-            tilesEnvelope.getTiles().clear();
+            final TilesEnvelope tilesEnvelope = new TilesEnvelope();
+            tilesEnvelope.setTiles(new ArrayList<Tile>());
 
 //            ArrayList<Tile> tiles = tilesMap.getFlattenedTiles();
             tilesEnvelope.getTiles().addAll(tilesMap.getFlattenedTiles());

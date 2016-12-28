@@ -12,6 +12,7 @@ public class Textures {
     public static class Sidebar {
         public static final TextureRegion SIDEBAR = loadSidebar();
         public static final TextureRegion HOUSE = loadHouse()[0][0];
+        public static final TextureRegion BULLDOZER = loadBulldozer();
 
     }
 
@@ -46,6 +47,13 @@ public class Textures {
         final int frameRows = 30;
 
         return splitTextureRegion(frameColumns, frameRows, new Texture(Gdx.files.internal("buildings/build.png")));
+    }
+
+    private static TextureRegion loadBulldozer() {
+        final int frameColumns = 1;
+        final int frameRows = 1;
+
+        return splitTextureRegion(frameColumns, frameRows, new Texture(Gdx.files.internal("sidebar/bulldozer.png")))[0][0];
     }
 
     private static TextureRegion[][] loadRoad() {

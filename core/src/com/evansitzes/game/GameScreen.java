@@ -3,9 +3,7 @@ package com.evansitzes.game;
 import com.badlogic.gdx.*;
 import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.Input.Keys;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.tiled.TiledMap;
@@ -44,6 +42,8 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
     private TextureRegionDrawable sidebarDrawable;
 
     private TextureRegionDrawable selectedBuildingImage;
+    private TextureRegionDrawable bulldozingImage;
+    Pixmap bulldozingPixmap;
     private float buildingX;
     private float buildingY;
 
@@ -54,6 +54,7 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
     Label fpsLabel;
 
     private boolean buildingSelected;
+    private boolean bulldozingEnabled;
     //TODO replace with building object maybe?
     private String currentBuildingName;
     private int currentImageTilesize;
@@ -82,11 +83,13 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
         final float h = Gdx.graphics.getHeight();
 
         camera = new OrthographicCamera();
-        camera.setToOrtho(false, w / Configuration.WIDTH_MODIFIER, h / Configuration.HEIGHT_MODIFIER);
+        camera.setToOrtho(false, w, h);
         camera.update();
 //        tiledMap = new TmxMapLoader().load("maps/basic-level1.tmx");
         this.level = TmxLevelLoader.load(Vector2.Zero, game, this, "test-map");
         TILE_SIZE = (int) (level.tileHeight * Configuration.WIDTH_MODIFIER);
+        bulldozingPixmap = new Pixmap(Gdx.files.internal("sidebar/bulldozer.png"));
+//        bulldozingPixmap.dispose();
 
         // Load State
         buildings = StateHelper.loadBuildingsState(game);
@@ -101,12 +104,11 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
         sidebar = Textures.Sidebar.SIDEBAR;
         sidebarDrawable = new TextureRegionDrawable(sidebar);
 
+        // TODO externalize this
         final TextButton saveButton = new TextButton("Save", skin);
         final Button imgButton = new Button(new Image(Textures.Sidebar.HOUSE), skin);
         final Button roadButton = new Button(new Image(Textures.Road.VERTICLE_ROAD), skin);
-
-        roadButton.setWidth(TILE_SIZE * Configuration.WIDTH_MODIFIER);
-        roadButton.setHeight(TILE_SIZE * Configuration.HEIGHT_MODIFIER);
+        final Button bulldozeButton = new Button(new Image(Textures.Sidebar.BULLDOZER), skin);
 
         imgButton.addListener(new ClickListener() {
             @Override
@@ -115,6 +117,7 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
                 currentBuildingName = "house";
                 selectedBuildingImage = new TextureRegionDrawable((Textures.Sidebar.HOUSE));
                 buildingSelected = true;
+                bulldozingEnabled = false;
             }
         });
 
@@ -125,6 +128,7 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
                 currentBuildingName = "road";
                 selectedBuildingImage = new TextureRegionDrawable((Textures.Road.VERTICLE_ROAD));
                 buildingSelected = true;
+                bulldozingEnabled = false;
             }
         });
 
@@ -134,6 +138,16 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
                 System.out.println("Saving!");
                 StateHelper.saveBuildingsState(buildings);
                 StateHelper.saveTilesState(tilesMap);
+            }
+        });
+
+        bulldozeButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(final InputEvent event, final float x, final float y) {
+                System.out.println("Deleting!");
+                bulldozingImage = new TextureRegionDrawable((Textures.Sidebar.BULLDOZER));
+                bulldozingEnabled = true;
+                buildingSelected = false;
             }
         });
 
@@ -149,6 +163,7 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
         table.add(imgButton);
         table.add(roadButton);
         table.add(saveButton);
+        table.add(bulldozeButton);
 
         table.setDebug(true); // turn on all debug lines (table, cell, and widget)
         table.setHeight(h);
@@ -190,12 +205,27 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
                                     level.tileHeight * Configuration.HEIGHT_MODIFIER * currentImageTilesize);
         }
 
+        if (bulldozingEnabled) {
+
+            Gdx.graphics.setCursor(Gdx.graphics.newCursor(bulldozingPixmap, 0, 0));
+            // TODO refactor
+            // - global variable modification
+//            setCornerTileFromMiddleArea(currentMouseX, currentMouseY, 1);
+//            bulldozingImage.draw(game.batch,
+//                    currentTileX,
+//                    currentTileY,
+//                    15,
+//                    15);
+        }
+
+
         for (final Building building : buildings) {
             building.draw();
         }
 
         game.batch.end();
 
+        stage.act(delta);
         stage.draw();
     }
 
@@ -229,11 +259,17 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
 
         if (button == Buttons.RIGHT) {
             buildingSelected = false;
+            bulldozingEnabled = false;
+            Gdx.graphics.setSystemCursor(Cursor.SystemCursor.Arrow);
         }
 
         if (button == Buttons.LEFT) {
             System.out.println(screenX);
             System.out.println(Gdx.graphics.getHeight() - screenY);
+
+            if (currentTileX < 0 || currentTileY < 0) {
+                return false;
+            }
 
             if (buildingSelected && !isPlacementAreaOccupied()) {
                 final Building building = new Building(game, currentImageTilesize, currentBuildingName);
@@ -241,7 +277,22 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
                 building.y = currentTileY;
 
                 buildings.add(building);
-                setDevelopedTiles();
+                setAreDevelopedTiles(true);
+            }
+
+            setCornerTileFromMiddleArea(screenX, Gdx.graphics.getHeight() - screenY, 1);
+            if (bulldozingEnabled && isClickedSquareOccupied()) {
+
+                for (final Building building : buildings) {
+                    if (building.overhangs(currentTileX, currentTileY)) {
+                        buildings.remove(building);
+                        currentImageTilesize = building.tileSize;
+                        break;
+                    }
+                }
+
+                //TODO tile size
+                setAreDevelopedTiles(false);
             }
         }
 
@@ -287,19 +338,19 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
 
     }
 
-    private void setDevelopedTiles() {
-
+    private void setAreDevelopedTiles(final boolean isOccupied) {
         for (int i = 0; i < currentImageTilesize; i++) {
             for (int j = 0; j < currentImageTilesize; j++) {
-                tilesMap.getTile(currentTileX / TILE_SIZE + i, currentTileY / TILE_SIZE + j).setOccupied(true);
+                tilesMap.getTile(currentTileX / TILE_SIZE + i, currentTileY / TILE_SIZE + j).setOccupied(isOccupied);
             }
         }
-
     }
 
+    private boolean isClickedSquareOccupied() {
+        return tilesMap.getTile(currentTileX / TILE_SIZE, currentTileY / TILE_SIZE).isOccupied();
+    }
 
     private boolean isPlacementAreaOccupied() {
-
         for (int i = 0; i < currentImageTilesize; i++) {
             for (int j = 0; j < currentImageTilesize; j++) {
                 if (tilesMap.getTile(currentTileX / TILE_SIZE + i, currentTileY / TILE_SIZE + j).isOccupied()) {
