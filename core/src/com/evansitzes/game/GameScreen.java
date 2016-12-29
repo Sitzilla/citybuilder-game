@@ -21,6 +21,8 @@ import com.evansitzes.game.buildings.Building;
 import com.evansitzes.game.environment.Level;
 import com.evansitzes.game.environment.TilesMap;
 import com.evansitzes.game.helpers.TextHelper;
+import com.evansitzes.game.people.Person;
+import com.evansitzes.game.people.SpriteHandler;
 import com.evansitzes.game.state.StateHelper;
 
 import java.util.ArrayList;
@@ -68,12 +70,15 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
     private int currentTileY;
 
     private final ArrayList<Building> buildings;
+    private final Person person;
 //    private final ArrayList<Tile> tilesMap = new ArrayList<Tile>();
 //    private final TreeSet<Integer> developedXTiles = new TreeSet<Integer>();
 //    private final TreeSet<Integer> developedYTiles = new TreeSet<Integer>();
 
     private final CityBuildingGame game;
     private final GameflowController gameflowController;
+
+    private final SpriteHandler spriteHandler;
 
     public GameScreen(final CityBuildingGame game, final GameflowController gameflowController) {
         this.game = game;
@@ -187,7 +192,13 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
         final InputMultiplexer multiplexer = new InputMultiplexer();
         multiplexer.addProcessor(stage);
         multiplexer.addProcessor(this);
-        Gdx.input.setInputProcessor(multiplexer);    }
+        Gdx.input.setInputProcessor(multiplexer);
+
+
+        // Create sprites
+        person = new Person(game, this);
+        spriteHandler = new SpriteHandler(game, person);
+    }
 
     @Override
     public void create () {
@@ -206,7 +217,6 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
         game.batch.begin();
 
 //        font.draw(game.batch, "Population:", Gdx.graphics.getWidth() - 400, Gdx.graphics.getHeight() - 10);
-
 
         if (buildingSelected) {
             // TODO refactor
@@ -238,6 +248,8 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
         for (final Building building : buildings) {
             building.draw();
         }
+
+        spriteHandler.handleSprite(delta);
 
         game.batch.end();
 

@@ -1169,40 +1169,40 @@ tiles:
   occupied: false
 - x: 12
   y: 5
-  occupied: false
+  occupied: true
 - x: 12
   y: 6
-  occupied: false
+  occupied: true
 - x: 12
   y: 7
-  occupied: false
+  occupied: true
 - x: 12
   y: 8
-  occupied: false
+  occupied: true
 - x: 12
   y: 9
-  occupied: false
+  occupied: true
 - x: 12
   y: 10
-  occupied: false
+  occupied: true
 - x: 12
   y: 11
-  occupied: false
+  occupied: true
 - x: 12
   y: 12
-  occupied: false
+  occupied: true
 - x: 12
   y: 13
-  occupied: false
+  occupied: true
 - x: 12
   y: 14
-  occupied: false
+  occupied: true
 - x: 12
   y: 15
-  occupied: false
+  occupied: true
 - x: 12
   y: 16
-  occupied: false
+  occupied: true
 - x: 12
   y: 17
   occupied: false
