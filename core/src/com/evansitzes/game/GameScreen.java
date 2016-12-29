@@ -2,7 +2,9 @@ package com.evansitzes.game;
 
 import com.badlogic.gdx.*;
 import com.badlogic.gdx.Input.Buttons;
-import com.badlogic.gdx.graphics.*;
+import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.tiled.TiledMap;
@@ -18,6 +20,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.evansitzes.game.buildings.Building;
 import com.evansitzes.game.environment.Level;
 import com.evansitzes.game.environment.TilesMap;
+import com.evansitzes.game.helpers.TextHelper;
 import com.evansitzes.game.state.StateHelper;
 
 import java.util.ArrayList;
@@ -40,6 +43,7 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
 
     private TextureRegion sidebar;
     private TextureRegionDrawable sidebarDrawable;
+    private TextureRegionDrawable topbarDrawable;
 
     private TextureRegionDrawable selectedBuildingImage;
     private TextureRegionDrawable bulldozingImage;
@@ -99,7 +103,7 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
 
         border = new NinePatch(Textures.Colors.RED, 0, 0, 0, 0);
 
-        sidebar = Textures.Sidebar.SIDEBAR;
+        sidebar = Textures.Sidebar.BACKGROUND;
         sidebarDrawable = new TextureRegionDrawable(sidebar);
 
         // TODO externalize this
@@ -154,21 +158,31 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
 //        final Label addressLabel = new Label("Address:", skin);
 //        final TextField addressText = new TextField("", skin);
 
-        final Table table = new Table();
+        final Table entireScreenTable = new Table();
+        final Table sidebarTable = new Table();
 //        table.setFillParent(true);
-        table.setBackground(sidebarDrawable);
+        entireScreenTable.setBackground(sidebarDrawable);
 
-        table.add(imgButton);
-        table.add(roadButton);
-        table.add(saveButton);
-        table.add(bulldozeButton);
+        sidebarTable.add(imgButton);
+        sidebarTable.add(roadButton);
+        sidebarTable.add(saveButton);
+        sidebarTable.add(bulldozeButton);
 
-        table.setDebug(true); // turn on all debug lines (table, cell, and widget)
-        table.setHeight(Gdx.graphics.getHeight());
-        table.setWidth(300);
-        table.setPosition(Gdx.graphics.getWidth() - 300, 0);
+        entireScreenTable.setDebug(true); // turn on all debug lines (table, cell, and widget)
+        entireScreenTable.setHeight(Gdx.graphics.getHeight());
+        entireScreenTable.setWidth(Gdx.graphics.getWidth());
 
-        stage.addActor(table);
+        sidebarTable.setDebug(true); // turn on all debug lines (table, cell, and widget)
+        sidebarTable.setHeight(Gdx.graphics.getHeight());
+        sidebarTable.setWidth(300);
+        sidebarTable.setPosition(Gdx.graphics.getWidth() - 300, 0);
+
+        stage.addActor(entireScreenTable);
+        stage.addActor(sidebarTable);
+
+        // Add topbar text
+        stage.addActor(TextHelper.createText("Population: ", Gdx.graphics.getWidth() - 700, Gdx.graphics.getHeight() - 35));
+        stage.addActor(TextHelper.createText("100", Gdx.graphics.getWidth() - 620, Gdx.graphics.getHeight() - 35));
 
         final InputMultiplexer multiplexer = new InputMultiplexer();
         multiplexer.addProcessor(stage);
@@ -190,6 +204,9 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
         game.batch.setProjectionMatrix(camera.combined);
 
         game.batch.begin();
+
+//        font.draw(game.batch, "Population:", Gdx.graphics.getWidth() - 400, Gdx.graphics.getHeight() - 10);
+
 
         if (buildingSelected) {
             // TODO refactor
@@ -226,6 +243,8 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
 
         stage.act(delta);
         stage.draw();
+//        font.draw(game.batch, "Population:", 400, 400);
+
     }
 
     @Override

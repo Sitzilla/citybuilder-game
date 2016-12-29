@@ -10,7 +10,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 public class Textures {
 
     public static class Sidebar {
-        public static final TextureRegion SIDEBAR = loadSidebar();
+        public static final TextureRegion BACKGROUND = loadBackground();
         public static final TextureRegion HOUSE = loadHouse()[0][0];
         public static final TextureRegion BULLDOZER = loadBulldozer();
 
@@ -35,11 +35,18 @@ public class Textures {
 
     }
 
-    private static TextureRegion loadSidebar() {
+    private static TextureRegion loadBackground() {
         final int frameColumns = 1;
         final int frameRows = 1;
 
-        return splitTextureRegion(frameColumns, frameRows, new Texture(Gdx.files.internal("sidebar/demo_sidebar.png")))[0][0];
+        return splitTextureRegion(frameColumns, frameRows, new Texture(Gdx.files.internal("sidebar/test_background.png")))[0][0];
+    }
+
+    private static TextureRegion loadTopbar() {
+        final int frameColumns = 1;
+        final int frameRows = 1;
+
+        return splitTextureRegion(frameColumns, frameRows, new Texture(Gdx.files.internal("sidebar/top_bar.png")))[0][0];
     }
 
     private static TextureRegion[][] loadHouse() {
