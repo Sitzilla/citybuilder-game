@@ -34,8 +34,8 @@ public class StateHelper {
                 return buildings;
             }
 
-            for (Structure structure : structuresEnvelope.getStructures()) {
-                Building building = new Building(game, structure.getTileSize(), structure.getSpriteName());
+            for (final Structure structure : structuresEnvelope.getStructures()) {
+                final Building building = new Building(game, structure.getTileSize(), structure.getSpriteName());
                 building.x = structure.getX();
                 building.y = structure.getY();
                 buildings.add(building);
@@ -58,7 +58,7 @@ public class StateHelper {
             final File file = new File(String.valueOf(Gdx.files.local("state/structures.yml")));
 //            final StructuresEnvelope structuresEnvelope = mapper.readValue(file, StructuresEnvelope.class);
             final StructuresEnvelope structuresEnvelope = new StructuresEnvelope();
-            ArrayList<Structure> structures = new ArrayList<Structure>();
+            final ArrayList<Structure> structures = new ArrayList<Structure>();
             structuresEnvelope.setStructures(structures);
 
             for (final Building building : buildings) {
@@ -77,7 +77,7 @@ public class StateHelper {
         }
     }
 
-    public static TilesMap loadTilesState(float w, float h, int tileHeight, int tileWidth) {
+    public static TilesMap loadTilesState(final float mapWidth, final float mapHeight, final int tileHeight, final int tileWidth) {
         final ObjectMapper mapper = new ObjectMapper(new YAMLFactory()); // jackson databind
         mapper.registerModule(new JodaModule());
 
@@ -87,10 +87,10 @@ public class StateHelper {
 
             // If an empty map they initialize a new empty Tiles Map
             if (tilesEnvelope.getTiles() == null) {
-                return new TilesMap(w, h, tileHeight, tileWidth);
+                return new TilesMap(mapWidth * tileWidth, mapHeight * tileHeight, tileHeight, tileWidth);
             }
 
-            return new TilesMap(tilesEnvelope.getTiles(), w, h, tileHeight, tileWidth);
+            return new TilesMap(tilesEnvelope.getTiles(), mapWidth * tileWidth, mapHeight * tileHeight, tileHeight, tileWidth);
 
         } catch (final IOException e) {
             System.out.println(e);

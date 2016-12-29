@@ -5,7 +5,6 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
 import com.evansitzes.game.CityBuildingGame;
-import com.evansitzes.game.Configuration;
 import com.evansitzes.game.Textures;
 
 /**
@@ -25,7 +24,7 @@ public class Building extends Rectangle {
         rectangle = new Rectangle();
         sprite = new Sprite(getBuildingSprite(name));
         this.tileSize = tileSize;
-        sprite.setSize(Configuration.WIDTH_MODIFIER * 32 * tileSize, Configuration.HEIGHT_MODIFIER * 32 * tileSize);
+        sprite.setSize(32 * tileSize, 32 * tileSize);
         this.name = name;
     }
 
@@ -74,9 +73,9 @@ public class Building extends Rectangle {
     public boolean overhangs(int cornerX, int cornerY) {
         //TODO magic numbers
         return cornerX >= x
-            && cornerX < x + 32 * Configuration.WIDTH_MODIFIER * tileSize
+            && cornerX < x + 32 * tileSize
             && cornerY >= y
-            && cornerY < y + 32 * Configuration.HEIGHT_MODIFIER * tileSize;
+            && cornerY < y + 32 * tileSize;
 
     }
 }

@@ -1,7 +1,5 @@
 package com.evansitzes.game.environment;
 
-import com.evansitzes.game.Configuration;
-
 import java.util.ArrayList;
 
 /**
@@ -15,10 +13,10 @@ public class TilesMap {
     public TilesMap(final ArrayList<Tile> flattenedTiles, final float mapDimensionsX, final float mapDimensionsY, final int tileHeight, final int tileWidth) {
         int counter = 0;
 
-        for (int i = 0; i < mapDimensionsX / (tileHeight * Configuration.HEIGHT_MODIFIER); i++) {
+        for (int i = 0; i < mapDimensionsX / tileWidth; i++) {
             final ArrayList<Tile> yTiles = new ArrayList<Tile>();
 
-            for (int j = 0; j < mapDimensionsY / (tileWidth * Configuration.WIDTH_MODIFIER); j++) {
+            for (int j = 0; j < mapDimensionsY / tileHeight; j++) {
                 yTiles.add(flattenedTiles.get(counter));
                 counter++;
             }
@@ -30,11 +28,11 @@ public class TilesMap {
 
     // Create empty Tile Map from map dimensions
     public TilesMap(final float mapDimensionsX, final float mapDimensionsY, final int tileHeight, final int tileWidth) {
-        for (int i = 0; i < mapDimensionsX / (tileHeight * Configuration.HEIGHT_MODIFIER); i++) {
+        for (int i = 0; i < mapDimensionsX / tileWidth; i++) {
             final ArrayList<Tile> yTiles = new ArrayList<Tile>();
 
 
-            for (int j = 0; j < mapDimensionsY / (tileWidth * Configuration.WIDTH_MODIFIER); j++) {
+            for (int j = 0; j < mapDimensionsY / tileHeight; j++) {
                 yTiles.add(new Tile(i, j));
             }
 

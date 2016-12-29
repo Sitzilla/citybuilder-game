@@ -2,7 +2,6 @@ package com.evansitzes.game;
 
 import com.badlogic.gdx.*;
 import com.badlogic.gdx.Input.Buttons;
-import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -10,6 +9,7 @@ import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapRenderer;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
@@ -28,7 +28,7 @@ import java.util.ArrayList;
  */
 public class GameScreen extends ApplicationAdapter implements Screen, InputProcessor {
 
-    private static int BORDER_WIDTH = 3;
+    private static int BORDER_WIDTH = 1;
     private static int TILE_SIZE;
 
     private Texture img;
@@ -43,7 +43,7 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
 
     private TextureRegionDrawable selectedBuildingImage;
     private TextureRegionDrawable bulldozingImage;
-    Pixmap bulldozingPixmap;
+//    Pixmap bulldozingPixmap;
     private float buildingX;
     private float buildingY;
 
@@ -58,8 +58,8 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
     //TODO replace with building object maybe?
     private String currentBuildingName;
     private int currentImageTilesize;
-    private int currentMouseX;
-    private int currentMouseY;
+//    private int currentMouseX;
+//    private int currentMouseY;
     private int currentTileX;
     private int currentTileY;
 
@@ -79,21 +79,19 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
 
         skin = new Skin(Gdx.files.internal("skins/uiskin.json"));
 
-        final float w = Gdx.graphics.getWidth();
-        final float h = Gdx.graphics.getHeight();
-
         camera = new OrthographicCamera();
-        camera.setToOrtho(false, w, h);
+//        camera.setToOrtho(false, Gdx.graphics.getWidth() / Configuration.WIDTH_MODIFIER, Gdx.graphics.getHeight() / Configuration.HEIGHT_MODIFIER);
+        camera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         camera.update();
 //        tiledMap = new TmxMapLoader().load("maps/basic-level1.tmx");
         this.level = TmxLevelLoader.load(Vector2.Zero, game, this, "test-map");
-        TILE_SIZE = (int) (level.tileHeight * Configuration.WIDTH_MODIFIER);
-        bulldozingPixmap = new Pixmap(Gdx.files.internal("sidebar/bulldozer.png"));
+        TILE_SIZE = (int) (level.tileHeight);
+//        bulldozingPixmap = new Pixmap(Gdx.files.internal("sidebar/bulldozer.png"));
 //        bulldozingPixmap.dispose();
 
         // Load State
         buildings = StateHelper.loadBuildingsState(game);
-        tilesMap = StateHelper.loadTilesState(w, h, level.tileHeight, level.tileWidth);
+        tilesMap = StateHelper.loadTilesState(level.mapWidth, level.mapHeight, level.tileHeight, level.tileWidth);
 //        tilesMap = new TilesMap(w, h, level.tileHeight, level.tileWidth);
 
         this.tiledMapRenderer = new OrthogonalTiledMapRenderer(level.map);
@@ -166,9 +164,9 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
         table.add(bulldozeButton);
 
         table.setDebug(true); // turn on all debug lines (table, cell, and widget)
-        table.setHeight(h);
+        table.setHeight(Gdx.graphics.getHeight());
         table.setWidth(300);
-        table.setPosition(w - 300, 0);
+        table.setPosition(Gdx.graphics.getWidth() - 300, 0);
 
         stage.addActor(table);
 
@@ -189,25 +187,26 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
         camera.update();
         tiledMapRenderer.setView(camera);
         tiledMapRenderer.render();
+        game.batch.setProjectionMatrix(camera.combined);
 
         game.batch.begin();
 
         if (buildingSelected) {
             // TODO refactor
             // - global variable modification
-            setCornerTileFromMiddleArea(currentMouseX, currentMouseY, currentImageTilesize);
+            setCornerTileFromMiddleArea((int) getMousePositionInGameWorld().x, (int) getMousePositionInGameWorld().y, currentImageTilesize);
             drawTileBorder(currentTileX, currentTileY, currentImageTilesize);
 
             selectedBuildingImage.draw(game.batch,
                                     currentTileX,
                                     currentTileY,
-                                    level.tileWidth * Configuration.WIDTH_MODIFIER * currentImageTilesize,
-                                    level.tileHeight * Configuration.HEIGHT_MODIFIER * currentImageTilesize);
+                                    level.tileWidth * currentImageTilesize,
+                                    level.tileHeight * currentImageTilesize);
         }
 
         if (bulldozingEnabled) {
 
-            Gdx.graphics.setCursor(Gdx.graphics.newCursor(bulldozingPixmap, 0, 0));
+//            Gdx.graphics.setCursor(Gdx.graphics.newCursor(bulldozingPixmap, 0, 0));
             // TODO refactor
             // - global variable modification
 //            setCornerTileFromMiddleArea(currentMouseX, currentMouseY, 1);
@@ -231,20 +230,20 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
 
     @Override
     public boolean keyDown(final int keycode) {
+        if(keycode == Input.Keys.LEFT)
+            camera.translate(-32,0);
+        if(keycode == Input.Keys.RIGHT)
+            camera.translate(32,0);
+        if(keycode == Input.Keys.UP)
+            camera.translate(0,32);
+        if(keycode == Input.Keys.DOWN)
+            camera.translate(0,-32);
+
         return false;
     }
 
     @Override
     public boolean keyUp(final int keycode) {
-        if(keycode == Keys.LEFT)
-            camera.translate(-32,0);
-        if(keycode == Keys.RIGHT)
-            camera.translate(32,0);
-        if(keycode == Keys.UP)
-            camera.translate(0,32);
-        if(keycode == Keys.DOWN)
-            camera.translate(0,-32);
-
         return false;
     }
 
@@ -260,7 +259,7 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
         if (button == Buttons.RIGHT) {
             buildingSelected = false;
             bulldozingEnabled = false;
-            Gdx.graphics.setSystemCursor(Cursor.SystemCursor.Arrow);
+//            Gdx.graphics.setSystemCursor(Cursor.SystemCursor.Arrow);
         }
 
         if (button == Buttons.LEFT) {
@@ -280,19 +279,20 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
                 setAreDevelopedTiles(true);
             }
 
-            setCornerTileFromMiddleArea(screenX, Gdx.graphics.getHeight() - screenY, 1);
+            setCornerTileFromMiddleArea((int) getMousePositionInGameWorld().x, (int) getMousePositionInGameWorld().y, 1);
+
             if (bulldozingEnabled && isClickedSquareOccupied()) {
 
                 for (final Building building : buildings) {
                     if (building.overhangs(currentTileX, currentTileY)) {
                         buildings.remove(building);
-                        currentImageTilesize = building.tileSize;
+                        //TODO tile size
+                        setCornerTileFromMiddleArea((int) getMousePositionInGameWorld().x, (int) getMousePositionInGameWorld().y, building.tileSize);
+                        setAreDevelopedTiles(false);
                         break;
                     }
                 }
 
-                //TODO tile size
-                setAreDevelopedTiles(false);
             }
         }
 
@@ -317,8 +317,8 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
 //            buildingX = screenX - 25 * currentImageTilesize;
 //            buildingY = Gdx.graphics.getHeight() - screenY - 25 * currentImageTilesize;
 
-            currentMouseX = screenX;
-            currentMouseY = Gdx.graphics.getHeight() - screenY;
+//            currentMouseX = screenX;
+//            currentMouseY = Gdx.graphics.getHeight() - screenY;
 
         return false;
     }
@@ -336,6 +336,10 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
     @Override
     public void hide() {
 
+    }
+
+    private Vector3 getMousePositionInGameWorld() {
+        return camera.unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
     }
 
     private void setAreDevelopedTiles(final boolean isOccupied) {
