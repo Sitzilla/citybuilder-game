@@ -276,6 +276,18 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
     public boolean touchDown(final int screenX, final int screenY, final int pointer, final int button) {
 
         if (button == Buttons.RIGHT) {
+
+            // Show information popup
+            if (!buildingSelected && !bulldozingEnabled) {
+                setCornerTileFromMiddleArea((int) getMousePositionInGameWorld().x, (int) getMousePositionInGameWorld().y, 1);
+                if (isClickedSquareOccupied()) {
+                    System.out.println("Show Dialog");
+
+                    BasicInformationPopup popup = new BasicInformationPopup("Building Info", skin);
+                    stage.addActor(popup);
+                }
+            }
+
             buildingSelected = false;
             bulldozingEnabled = false;
 //            Gdx.graphics.setSystemCursor(Cursor.SystemCursor.Arrow);

@@ -1,2 +1,6 @@
 ---
-structures: []
+structures:
+- x: 672.0
+  y: 384.0
+  sprite_name: "house"
+  tile_size: 2

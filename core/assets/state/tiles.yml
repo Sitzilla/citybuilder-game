@@ -2054,10 +2054,10 @@ tiles:
   occupied: false
 - x: 21
   y: 12
-  occupied: false
+  occupied: true
 - x: 21
   y: 13
-  occupied: false
+  occupied: true
 - x: 21
   y: 14
   occupied: false
@@ -2150,10 +2150,10 @@ tiles:
   occupied: false
 - x: 22
   y: 12
-  occupied: false
+  occupied: true
 - x: 22
   y: 13
-  occupied: false
+  occupied: true
 - x: 22
   y: 14
   occupied: false
