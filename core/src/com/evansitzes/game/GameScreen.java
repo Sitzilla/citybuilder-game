@@ -2,16 +2,14 @@ package com.evansitzes.game;
 
 import com.badlogic.gdx.*;
 import com.badlogic.gdx.Input.Buttons;
-import com.badlogic.gdx.Input.Keys;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapRenderer;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
@@ -19,7 +17,8 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.evansitzes.game.buildings.Building;
 import com.evansitzes.game.environment.Level;
-import com.evansitzes.game.environment.MapTiles;
+import com.evansitzes.game.environment.TilesMap;
+import com.evansitzes.game.state.StateHelper;
 
 import java.util.ArrayList;
 
@@ -29,7 +28,7 @@ import java.util.ArrayList;
  */
 public class GameScreen extends ApplicationAdapter implements Screen, InputProcessor {
 
-    private static int BORDER_WIDTH = 3;
+    private static int BORDER_WIDTH = 1;
     private static int TILE_SIZE;
 
     private Texture img;
@@ -37,12 +36,14 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
     private OrthographicCamera camera;
     private TiledMapRenderer tiledMapRenderer;
     private Level level;
-    private MapTiles mapTiles;
+    private TilesMap tilesMap;
 
     private TextureRegion sidebar;
     private TextureRegionDrawable sidebarDrawable;
 
     private TextureRegionDrawable selectedBuildingImage;
+    private TextureRegionDrawable bulldozingImage;
+//    Pixmap bulldozingPixmap;
     private float buildingX;
     private float buildingY;
 
@@ -53,14 +54,17 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
     Label fpsLabel;
 
     private boolean buildingSelected;
-    private int currentImageTilesize; //TODO replace with building object maybe?
-    private int currentMouseX;
-    private int currentMouseY;
+    private boolean bulldozingEnabled;
+    //TODO replace with building object maybe?
+    private String currentBuildingName;
+    private int currentImageTilesize;
+//    private int currentMouseX;
+//    private int currentMouseY;
     private int currentTileX;
     private int currentTileY;
 
-    private final ArrayList<Building> buildings = new ArrayList<Building>();
-//    private final ArrayList<Tile> mapTiles = new ArrayList<Tile>();
+    private final ArrayList<Building> buildings;
+//    private final ArrayList<Tile> tilesMap = new ArrayList<Tile>();
 //    private final TreeSet<Integer> developedXTiles = new TreeSet<Integer>();
 //    private final TreeSet<Integer> developedYTiles = new TreeSet<Integer>();
 
@@ -75,17 +79,20 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
 
         skin = new Skin(Gdx.files.internal("skins/uiskin.json"));
 
-        final float w = Gdx.graphics.getWidth();
-        final float h = Gdx.graphics.getHeight();
-
         camera = new OrthographicCamera();
-        camera.setToOrtho(false, w / Configuration.WIDTH_MODIFIER, h / Configuration.HEIGHT_MODIFIER);
+//        camera.setToOrtho(false, Gdx.graphics.getWidth() / Configuration.WIDTH_MODIFIER, Gdx.graphics.getHeight() / Configuration.HEIGHT_MODIFIER);
+        camera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         camera.update();
 //        tiledMap = new TmxMapLoader().load("maps/basic-level1.tmx");
         this.level = TmxLevelLoader.load(Vector2.Zero, game, this, "test-map");
-        TILE_SIZE = (int) (level.tileHeight * Configuration.WIDTH_MODIFIER);
+        TILE_SIZE = (int) (level.tileHeight);
+//        bulldozingPixmap = new Pixmap(Gdx.files.internal("sidebar/bulldozer.png"));
+//        bulldozingPixmap.dispose();
 
-        mapTiles = new MapTiles(w, h, level.tileHeight, level.tileWidth);
+        // Load State
+        buildings = StateHelper.loadBuildingsState(game);
+        tilesMap = StateHelper.loadTilesState(level.mapWidth, level.mapHeight, level.tileHeight, level.tileWidth);
+//        tilesMap = new TilesMap(w, h, level.tileHeight, level.tileWidth);
 
         this.tiledMapRenderer = new OrthogonalTiledMapRenderer(level.map);
         tiledMapRenderer.setView(camera);
@@ -95,18 +102,20 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
         sidebar = Textures.Sidebar.SIDEBAR;
         sidebarDrawable = new TextureRegionDrawable(sidebar);
 
+        // TODO externalize this
+        final TextButton saveButton = new TextButton("Save", skin);
         final Button imgButton = new Button(new Image(Textures.Sidebar.HOUSE), skin);
         final Button roadButton = new Button(new Image(Textures.Road.VERTICLE_ROAD), skin);
-
-        roadButton.setWidth(TILE_SIZE * Configuration.WIDTH_MODIFIER);
-        roadButton.setHeight(TILE_SIZE * Configuration.HEIGHT_MODIFIER);
+        final Button bulldozeButton = new Button(new Image(Textures.Sidebar.BULLDOZER), skin);
 
         imgButton.addListener(new ClickListener() {
             @Override
             public void clicked(final InputEvent event, final float x, final float y) {
                 currentImageTilesize = 2;
+                currentBuildingName = "house";
                 selectedBuildingImage = new TextureRegionDrawable((Textures.Sidebar.HOUSE));
                 buildingSelected = true;
+                bulldozingEnabled = false;
             }
         });
 
@@ -114,8 +123,29 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
             @Override
             public void clicked(final InputEvent event, final float x, final float y) {
                 currentImageTilesize = 1;
+                currentBuildingName = "road";
                 selectedBuildingImage = new TextureRegionDrawable((Textures.Road.VERTICLE_ROAD));
                 buildingSelected = true;
+                bulldozingEnabled = false;
+            }
+        });
+
+        saveButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(final InputEvent event, final float x, final float y) {
+                System.out.println("Saving!");
+                StateHelper.saveBuildingsState(buildings);
+                StateHelper.saveTilesState(tilesMap);
+            }
+        });
+
+        bulldozeButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(final InputEvent event, final float x, final float y) {
+                System.out.println("Deleting!");
+                bulldozingImage = new TextureRegionDrawable((Textures.Sidebar.BULLDOZER));
+                bulldozingEnabled = true;
+                buildingSelected = false;
             }
         });
 
@@ -130,11 +160,13 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
 
         table.add(imgButton);
         table.add(roadButton);
+        table.add(saveButton);
+        table.add(bulldozeButton);
 
         table.setDebug(true); // turn on all debug lines (table, cell, and widget)
-        table.setHeight(h);
+        table.setHeight(Gdx.graphics.getHeight());
         table.setWidth(300);
-        table.setPosition(w - 300, 0);
+        table.setPosition(Gdx.graphics.getWidth() - 300, 0);
 
         stage.addActor(table);
 
@@ -155,21 +187,36 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
         camera.update();
         tiledMapRenderer.setView(camera);
         tiledMapRenderer.render();
+        game.batch.setProjectionMatrix(camera.combined);
 
         game.batch.begin();
 
         if (buildingSelected) {
             // TODO refactor
             // - global variable modification
-            setCornerTileFromMiddleArea(currentMouseX, currentMouseY, currentImageTilesize);
+            setCornerTileFromMiddleArea((int) getMousePositionInGameWorld().x, (int) getMousePositionInGameWorld().y, currentImageTilesize);
             drawTileBorder(currentTileX, currentTileY, currentImageTilesize);
 
             selectedBuildingImage.draw(game.batch,
                                     currentTileX,
                                     currentTileY,
-                                    level.tileWidth * Configuration.WIDTH_MODIFIER * currentImageTilesize,
-                                    level.tileHeight * Configuration.HEIGHT_MODIFIER * currentImageTilesize);
+                                    level.tileWidth * currentImageTilesize,
+                                    level.tileHeight * currentImageTilesize);
         }
+
+        if (bulldozingEnabled) {
+
+//            Gdx.graphics.setCursor(Gdx.graphics.newCursor(bulldozingPixmap, 0, 0));
+            // TODO refactor
+            // - global variable modification
+//            setCornerTileFromMiddleArea(currentMouseX, currentMouseY, 1);
+//            bulldozingImage.draw(game.batch,
+//                    currentTileX,
+//                    currentTileY,
+//                    15,
+//                    15);
+        }
+
 
         for (final Building building : buildings) {
             building.draw();
@@ -177,25 +224,26 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
 
         game.batch.end();
 
+        stage.act(delta);
         stage.draw();
     }
 
     @Override
     public boolean keyDown(final int keycode) {
+        if(keycode == Input.Keys.LEFT)
+            camera.translate(-32,0);
+        if(keycode == Input.Keys.RIGHT)
+            camera.translate(32,0);
+        if(keycode == Input.Keys.UP)
+            camera.translate(0,32);
+        if(keycode == Input.Keys.DOWN)
+            camera.translate(0,-32);
+
         return false;
     }
 
     @Override
     public boolean keyUp(final int keycode) {
-        if(keycode == Keys.LEFT)
-            camera.translate(-32,0);
-        if(keycode == Keys.RIGHT)
-            camera.translate(32,0);
-        if(keycode == Keys.UP)
-            camera.translate(0,32);
-        if(keycode == Keys.DOWN)
-            camera.translate(0,-32);
-
         return false;
     }
 
@@ -210,19 +258,41 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
 
         if (button == Buttons.RIGHT) {
             buildingSelected = false;
+            bulldozingEnabled = false;
+//            Gdx.graphics.setSystemCursor(Cursor.SystemCursor.Arrow);
         }
 
         if (button == Buttons.LEFT) {
             System.out.println(screenX);
             System.out.println(Gdx.graphics.getHeight() - screenY);
 
+            if (currentTileX < 0 || currentTileY < 0) {
+                return false;
+            }
+
             if (buildingSelected && !isPlacementAreaOccupied()) {
-                final Building building = new Building(game, selectedBuildingImage.getRegion(), currentImageTilesize);
+                final Building building = new Building(game, currentImageTilesize, currentBuildingName);
                 building.x = currentTileX;
                 building.y = currentTileY;
 
                 buildings.add(building);
-                setDevelopedTiles();
+                setAreDevelopedTiles(true);
+            }
+
+            setCornerTileFromMiddleArea((int) getMousePositionInGameWorld().x, (int) getMousePositionInGameWorld().y, 1);
+
+            if (bulldozingEnabled && isClickedSquareOccupied()) {
+
+                for (final Building building : buildings) {
+                    if (building.overhangs(currentTileX, currentTileY)) {
+                        buildings.remove(building);
+                        //TODO tile size
+                        setCornerTileFromMiddleArea((int) getMousePositionInGameWorld().x, (int) getMousePositionInGameWorld().y, building.tileSize);
+                        setAreDevelopedTiles(false);
+                        break;
+                    }
+                }
+
             }
         }
 
@@ -247,8 +317,8 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
 //            buildingX = screenX - 25 * currentImageTilesize;
 //            buildingY = Gdx.graphics.getHeight() - screenY - 25 * currentImageTilesize;
 
-            currentMouseX = screenX;
-            currentMouseY = Gdx.graphics.getHeight() - screenY;
+//            currentMouseX = screenX;
+//            currentMouseY = Gdx.graphics.getHeight() - screenY;
 
         return false;
     }
@@ -268,22 +338,26 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
 
     }
 
-    private void setDevelopedTiles() {
-
-        for (int i = 0; i < currentImageTilesize; i++) {
-            for (int j = 0; j < currentImageTilesize; j++) {
-                mapTiles.getTile(currentTileX / TILE_SIZE + i, currentTileY / TILE_SIZE + j).setOccupied(true);
-            }
-        }
-
+    private Vector3 getMousePositionInGameWorld() {
+        return camera.unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
     }
 
-
-    private boolean isPlacementAreaOccupied() {
-
+    private void setAreDevelopedTiles(final boolean isOccupied) {
         for (int i = 0; i < currentImageTilesize; i++) {
             for (int j = 0; j < currentImageTilesize; j++) {
-                if (mapTiles.getTile(currentTileX / TILE_SIZE + i, currentTileY / TILE_SIZE + j).isOccupied()) {
+                tilesMap.getTile(currentTileX / TILE_SIZE + i, currentTileY / TILE_SIZE + j).setOccupied(isOccupied);
+            }
+        }
+    }
+
+    private boolean isClickedSquareOccupied() {
+        return tilesMap.getTile(currentTileX / TILE_SIZE, currentTileY / TILE_SIZE).isOccupied();
+    }
+
+    private boolean isPlacementAreaOccupied() {
+        for (int i = 0; i < currentImageTilesize; i++) {
+            for (int j = 0; j < currentImageTilesize; j++) {
+                if (tilesMap.getTile(currentTileX / TILE_SIZE + i, currentTileY / TILE_SIZE + j).isOccupied()) {
                     return true;
                 }
             }
