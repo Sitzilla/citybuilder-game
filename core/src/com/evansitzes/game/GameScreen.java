@@ -2,7 +2,9 @@ package com.evansitzes.game;
 
 import com.badlogic.gdx.*;
 import com.badlogic.gdx.Input.Buttons;
-import com.badlogic.gdx.graphics.*;
+import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.tiled.TiledMap;
@@ -18,6 +20,9 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.evansitzes.game.buildings.Building;
 import com.evansitzes.game.environment.Level;
 import com.evansitzes.game.environment.TilesMap;
+import com.evansitzes.game.helpers.TextHelper;
+import com.evansitzes.game.people.Person;
+import com.evansitzes.game.people.SpriteHandler;
 import com.evansitzes.game.state.StateHelper;
 
 import java.util.ArrayList;
@@ -36,10 +41,11 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
     private OrthographicCamera camera;
     private TiledMapRenderer tiledMapRenderer;
     private Level level;
-    private TilesMap tilesMap;
+    private final TilesMap tilesMap;
 
     private TextureRegion sidebar;
     private TextureRegionDrawable sidebarDrawable;
+    private TextureRegionDrawable topbarDrawable;
 
     private TextureRegionDrawable selectedBuildingImage;
     private TextureRegionDrawable bulldozingImage;
@@ -64,12 +70,15 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
     private int currentTileY;
 
     private final ArrayList<Building> buildings;
+    private final Person person;
 //    private final ArrayList<Tile> tilesMap = new ArrayList<Tile>();
 //    private final TreeSet<Integer> developedXTiles = new TreeSet<Integer>();
 //    private final TreeSet<Integer> developedYTiles = new TreeSet<Integer>();
 
     private final CityBuildingGame game;
     private final GameflowController gameflowController;
+
+    private final SpriteHandler spriteHandler;
 
     public GameScreen(final CityBuildingGame game, final GameflowController gameflowController) {
         this.game = game;
@@ -80,10 +89,8 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
         skin = new Skin(Gdx.files.internal("skins/uiskin.json"));
 
         camera = new OrthographicCamera();
-//        camera.setToOrtho(false, Gdx.graphics.getWidth() / Configuration.WIDTH_MODIFIER, Gdx.graphics.getHeight() / Configuration.HEIGHT_MODIFIER);
         camera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         camera.update();
-//        tiledMap = new TmxMapLoader().load("maps/basic-level1.tmx");
         this.level = TmxLevelLoader.load(Vector2.Zero, game, this, "test-map");
         TILE_SIZE = (int) (level.tileHeight);
 //        bulldozingPixmap = new Pixmap(Gdx.files.internal("sidebar/bulldozer.png"));
@@ -91,15 +98,14 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
 
         // Load State
         buildings = StateHelper.loadBuildingsState(game);
-        tilesMap = StateHelper.loadTilesState(level.mapWidth, level.mapHeight, level.tileHeight, level.tileWidth);
-//        tilesMap = new TilesMap(w, h, level.tileHeight, level.tileWidth);
+        tilesMap = StateHelper.loadTilesState(level.mapWidth, level.mapHeight, level.tileHeight, level.tileWidth, buildings);
 
         this.tiledMapRenderer = new OrthogonalTiledMapRenderer(level.map);
         tiledMapRenderer.setView(camera);
 
         border = new NinePatch(Textures.Colors.RED, 0, 0, 0, 0);
 
-        sidebar = Textures.Sidebar.SIDEBAR;
+        sidebar = Textures.Sidebar.BACKGROUND;
         sidebarDrawable = new TextureRegionDrawable(sidebar);
 
         // TODO externalize this
@@ -154,26 +160,42 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
 //        final Label addressLabel = new Label("Address:", skin);
 //        final TextField addressText = new TextField("", skin);
 
-        final Table table = new Table();
+        final Table entireScreenTable = new Table();
+        final Table sidebarTable = new Table();
 //        table.setFillParent(true);
-        table.setBackground(sidebarDrawable);
+        entireScreenTable.setBackground(sidebarDrawable);
 
-        table.add(imgButton);
-        table.add(roadButton);
-        table.add(saveButton);
-        table.add(bulldozeButton);
+        sidebarTable.add(imgButton);
+        sidebarTable.add(roadButton);
+        sidebarTable.add(saveButton);
+        sidebarTable.add(bulldozeButton);
 
-        table.setDebug(true); // turn on all debug lines (table, cell, and widget)
-        table.setHeight(Gdx.graphics.getHeight());
-        table.setWidth(300);
-        table.setPosition(Gdx.graphics.getWidth() - 300, 0);
+        entireScreenTable.setDebug(true); // turn on all debug lines (table, cell, and widget)
+        entireScreenTable.setHeight(Gdx.graphics.getHeight());
+        entireScreenTable.setWidth(Gdx.graphics.getWidth());
 
-        stage.addActor(table);
+        sidebarTable.setDebug(true); // turn on all debug lines (table, cell, and widget)
+        sidebarTable.setHeight(Gdx.graphics.getHeight());
+        sidebarTable.setWidth(300);
+        sidebarTable.setPosition(Gdx.graphics.getWidth() - 300, 0);
+
+        stage.addActor(entireScreenTable);
+        stage.addActor(sidebarTable);
+
+        // Add topbar text
+        stage.addActor(TextHelper.createText("Population: ", Gdx.graphics.getWidth() - 700, Gdx.graphics.getHeight() - 35));
+        stage.addActor(TextHelper.createText("100", Gdx.graphics.getWidth() - 620, Gdx.graphics.getHeight() - 35));
 
         final InputMultiplexer multiplexer = new InputMultiplexer();
         multiplexer.addProcessor(stage);
         multiplexer.addProcessor(this);
-        Gdx.input.setInputProcessor(multiplexer);    }
+        Gdx.input.setInputProcessor(multiplexer);
+
+
+        // Create sprites
+        person = new Person(game, this);
+        spriteHandler = new SpriteHandler(game, person, TILE_SIZE, tilesMap);
+    }
 
     @Override
     public void create () {
@@ -190,6 +212,8 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
         game.batch.setProjectionMatrix(camera.combined);
 
         game.batch.begin();
+
+//        font.draw(game.batch, "Population:", Gdx.graphics.getWidth() - 400, Gdx.graphics.getHeight() - 10);
 
         if (buildingSelected) {
             // TODO refactor
@@ -222,10 +246,14 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
             building.draw();
         }
 
+        spriteHandler.handleSprite(delta);
+
         game.batch.end();
 
         stage.act(delta);
         stage.draw();
+//        font.draw(game.batch, "Population:", 400, 400);
+
     }
 
     @Override
@@ -257,6 +285,18 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
     public boolean touchDown(final int screenX, final int screenY, final int pointer, final int button) {
 
         if (button == Buttons.RIGHT) {
+
+            // Show information popup
+            if (!buildingSelected && !bulldozingEnabled) {
+                setCornerTileFromMiddleArea((int) getMousePositionInGameWorld().x, (int) getMousePositionInGameWorld().y, 1);
+                if (isClickedSquareOccupied()) {
+                    System.out.println("Show Dialog");
+
+                    BasicInformationPopup popup = new BasicInformationPopup("Building Info", skin);
+                    stage.addActor(popup);
+                }
+            }
+
             buildingSelected = false;
             bulldozingEnabled = false;
 //            Gdx.graphics.setSystemCursor(Cursor.SystemCursor.Arrow);
@@ -276,6 +316,8 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
                 building.y = currentTileY;
 
                 buildings.add(building);
+                setTileBuilding(building);
+//                spriteHandler.setBuildings(buildings);
                 setAreDevelopedTiles(true);
             }
 
@@ -286,8 +328,11 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
                 for (final Building building : buildings) {
                     if (building.overhangs(currentTileX, currentTileY)) {
                         buildings.remove(building);
+                        setTileBuilding(null);
+//                        spriteHandler.setBuildings(buildings);
                         //TODO tile size
-                        setCornerTileFromMiddleArea((int) getMousePositionInGameWorld().x, (int) getMousePositionInGameWorld().y, building.tileSize);
+//                        setCornerTileFromMiddleArea((int) getMousePositionInGameWorld().x, (int) getMousePositionInGameWorld().y, building.tileSize);
+                        currentImageTilesize = building.tileSize;
                         setAreDevelopedTiles(false);
                         break;
                     }
@@ -346,6 +391,14 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
         for (int i = 0; i < currentImageTilesize; i++) {
             for (int j = 0; j < currentImageTilesize; j++) {
                 tilesMap.getTile(currentTileX / TILE_SIZE + i, currentTileY / TILE_SIZE + j).setOccupied(isOccupied);
+            }
+        }
+    }
+
+    private void setTileBuilding(final Building building) {
+        for (int i = 0; i < currentImageTilesize; i++) {
+            for (int j = 0; j < currentImageTilesize; j++) {
+                tilesMap.getTile(currentTileX / TILE_SIZE + i, currentTileY / TILE_SIZE + j).setBuilding(building);
             }
         }
     }
