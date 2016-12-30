@@ -17,7 +17,6 @@ public class SimpleSprite extends Entity {
 //        rectangle = new Rectangle();
 //        rectangle.width = sprite.getWidth();
 //        rectangle.height = sprite.getHeight();
-        sprite.setPosition(370, 600);
 
     }
 

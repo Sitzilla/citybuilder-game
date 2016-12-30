@@ -81,7 +81,7 @@ public class Person extends Entity {
                 y -= MOMENT_SPEED;
             }
 
-            this.rectangle.set(x, y, 30, 30);
+//            this.rectangle.set(x, y, 30, 30);
             locate(x, y);
             animatedSprite.locate(x, y);
             currentSprite.locate(x, y);

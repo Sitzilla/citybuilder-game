@@ -197,7 +197,7 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
 
         // Create sprites
         person = new Person(game, this);
-        spriteHandler = new SpriteHandler(game, person);
+        spriteHandler = new SpriteHandler(game, person, TILE_SIZE, buildings);
     }
 
     @Override
@@ -319,6 +319,7 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
                 building.y = currentTileY;
 
                 buildings.add(building);
+                spriteHandler.setBuildings(buildings);
                 setAreDevelopedTiles(true);
             }
 
@@ -329,8 +330,10 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
                 for (final Building building : buildings) {
                     if (building.overhangs(currentTileX, currentTileY)) {
                         buildings.remove(building);
+                        spriteHandler.setBuildings(buildings);
                         //TODO tile size
-                        setCornerTileFromMiddleArea((int) getMousePositionInGameWorld().x, (int) getMousePositionInGameWorld().y, building.tileSize);
+//                        setCornerTileFromMiddleArea((int) getMousePositionInGameWorld().x, (int) getMousePositionInGameWorld().y, building.tileSize);
+                        currentImageTilesize = building.tileSize;
                         setAreDevelopedTiles(false);
                         break;
                     }
