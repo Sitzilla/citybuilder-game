@@ -41,7 +41,7 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
     private OrthographicCamera camera;
     private TiledMapRenderer tiledMapRenderer;
     private Level level;
-    private TilesMap tilesMap;
+    private final TilesMap tilesMap;
 
     private TextureRegion sidebar;
     private TextureRegionDrawable sidebarDrawable;
@@ -194,7 +194,7 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
 
         // Create sprites
         person = new Person(game, this);
-        spriteHandler = new SpriteHandler(game, person, TILE_SIZE, buildings);
+        spriteHandler = new SpriteHandler(game, person, TILE_SIZE, tilesMap);
     }
 
     @Override

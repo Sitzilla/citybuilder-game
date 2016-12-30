@@ -6,6 +6,7 @@ import com.evansitzes.game.GameScreen;
 import com.evansitzes.game.Textures;
 
 import static com.evansitzes.game.people.Person.Facing.DOWN;
+import static com.evansitzes.game.people.Person.Facing.RIGHT;
 import static com.evansitzes.game.people.Person.State.IDLE;
 
 /**
@@ -20,6 +21,7 @@ public class Person extends Entity {
     public AnimatedSprite animatedSprite;
     Configuration configuration;
 
+    public int edge;
     public State state;
 
     public enum State {
@@ -70,15 +72,19 @@ public class Person extends Entity {
 
             animatedSprite.setCurrentDirection(direction);
 
-//            if (direction == RIGHT) {
-//                position.x += MOMENT_SPEED;
-//            } else if (direction == LEFT) {
-//                position.x -= MOMENT_SPEED;
-//            } if (direction == UP) {
-//                position.y += MOMENT_SPEED;
-//            } else if (direction == DOWN) {
-            if (direction == DOWN) {
+            //TODO magic numbers + casts
+            if (direction == RIGHT) {
+                x += MOMENT_SPEED;
+                edge = (int) (x + 30);
+            } else if (direction == Facing.LEFT) {
+                x -= MOMENT_SPEED;
+                edge = (int) x + 3;
+            } if (direction == Facing.UP) {
+                y += MOMENT_SPEED;
+                edge = (int) (y + 13);
+            } else if (direction == DOWN) {
                 y -= MOMENT_SPEED;
+                edge = (int) y;
             }
 
 //            this.rectangle.set(x, y, 30, 30);

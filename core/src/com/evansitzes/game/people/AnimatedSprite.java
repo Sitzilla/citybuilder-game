@@ -13,39 +13,44 @@ public class AnimatedSprite extends Entity {
 
     private Animation currentAnimation;
 
-    private TextureRegion currentFrame;
-    private TextureRegion[] downWalking;
+    private final TextureRegion[] upWalking;
+    private final TextureRegion[] downWalking;
+    private final TextureRegion[] rightWalking;
+    private final TextureRegion[] leftWalking;
     private TextureRegion[] currentWalking;
+    private TextureRegion currentFrame;
 
     private float stateTime;
-    private boolean looping = true;
-    private float animationSpeed = 1f/5f;
+    private final boolean looping = true;
+    private final float animationSpeed = 1f/5f;
 
-    public AnimatedSprite(CityBuildingGame game) {
+    public AnimatedSprite(final CityBuildingGame game) {
         super(game);
+        upWalking = Textures.People.WALKING_UP;
         downWalking = Textures.People.WALKING_DOWN;
+        rightWalking = Textures.People.WALKING_RIGHT;
+        leftWalking = Textures.People.WALKING_LEFT;
+
         this.game = game;
 
         currentAnimation = new Animation(animationSpeed, downWalking);
     }
 
-    public void handle(float delta) {
+    public void handle(final float delta) {
         stateTime += delta;
         currentAnimation = new Animation(animationSpeed, currentWalking);
         currentFrame = currentAnimation.getKeyFrame(stateTime, looping);
 
-//        this.
-
         game.batch.draw(currentFrame, x, y);
     }
 
-    public void setCurrentDirection(Person.Facing direction) {
+    public void setCurrentDirection(final Person.Facing direction) {
         if (direction == Person.Facing.LEFT) {
-//            currentWalking = leftWalking;
+            currentWalking = leftWalking;
         } else if (direction == Person.Facing.RIGHT) {
-//            currentWalking = rightWalking;
-//        } else if (direction == Person.Facing.UP) {
-//            currentWalking = upWalking;
+            currentWalking = rightWalking;
+        } else if (direction == Person.Facing.UP) {
+            currentWalking = upWalking;
         } else if (direction == Person.Facing.DOWN) {
             currentWalking = downWalking;
         }
