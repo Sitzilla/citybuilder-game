@@ -21,7 +21,7 @@ import com.evansitzes.game.buildings.Building;
 import com.evansitzes.game.environment.Level;
 import com.evansitzes.game.environment.TilesMap;
 import com.evansitzes.game.helpers.TextHelper;
-import com.evansitzes.game.people.Person;
+import com.evansitzes.game.people.SpriteGenerator;
 import com.evansitzes.game.people.SpriteHandler;
 import com.evansitzes.game.state.StateHelper;
 
@@ -70,7 +70,6 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
     private int currentTileY;
 
     private final ArrayList<Building> buildings;
-    private final Person person;
 //    private final ArrayList<Tile> tilesMap = new ArrayList<Tile>();
 //    private final TreeSet<Integer> developedXTiles = new TreeSet<Integer>();
 //    private final TreeSet<Integer> developedYTiles = new TreeSet<Integer>();
@@ -193,8 +192,7 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
 
 
         // Create sprites
-        person = new Person(game, this);
-        spriteHandler = new SpriteHandler(game, person, TILE_SIZE, tilesMap);
+        spriteHandler = new SpriteHandler(game, SpriteGenerator.generatePerson(game, this), TILE_SIZE, tilesMap);
     }
 
     @Override
