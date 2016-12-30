@@ -192,7 +192,8 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
 
 
         // Create sprites
-        spriteHandler = new SpriteHandler(game, SpriteGenerator.generatePerson(game, this), TILE_SIZE, tilesMap);
+        spriteHandler = new SpriteHandler(game, TILE_SIZE, tilesMap);
+        spriteHandler.addSpriteToList(SpriteGenerator.generatePerson(game, this, TILE_SIZE, tilesMap));
     }
 
     @Override
@@ -244,7 +245,7 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
             building.draw();
         }
 
-        spriteHandler.handleSprite(delta);
+        spriteHandler.handleAllSprites(delta);
 
         game.batch.end();
 
@@ -256,6 +257,13 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
 
     @Override
     public boolean keyDown(final int keycode) {
+
+        // Generate new sprite
+        if (keycode == Input.Keys.ENTER) {
+            System.out.println("Generating new sprite");
+            spriteHandler.addSpriteToList(SpriteGenerator.generatePerson(game, this, TILE_SIZE, tilesMap));
+        }
+
         if(keycode == Input.Keys.LEFT)
             camera.translate(-32,0);
         if(keycode == Input.Keys.RIGHT)

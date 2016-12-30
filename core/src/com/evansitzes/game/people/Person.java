@@ -4,6 +4,7 @@ import com.evansitzes.game.CityBuildingGame;
 import com.evansitzes.game.Configuration;
 import com.evansitzes.game.GameScreen;
 import com.evansitzes.game.Textures;
+import com.evansitzes.game.buildings.Building;
 
 import static com.evansitzes.game.people.Person.Facing.DOWN;
 import static com.evansitzes.game.people.Person.Facing.RIGHT;
@@ -23,6 +24,11 @@ public class Person extends Entity {
 
     public int edge;
     public State state;
+
+    public Building currentBuilding;
+    public Facing nextDirection;
+    public int currentTileX;
+    public int currentTileY;
 
     public enum State {
         IDLE, WALKING
@@ -75,16 +81,16 @@ public class Person extends Entity {
             //TODO magic numbers + casts
             if (direction == RIGHT) {
                 x += MOMENT_SPEED;
-                edge = (int) (x + 30);
+                edge = x + 30;
             } else if (direction == Facing.LEFT) {
                 x -= MOMENT_SPEED;
-                edge = (int) x + 3;
+                edge = x + 3;
             } if (direction == Facing.UP) {
                 y += MOMENT_SPEED;
-                edge = (int) (y + 13);
+                edge = y + 13;
             } else if (direction == DOWN) {
                 y -= MOMENT_SPEED;
-                edge = (int) y;
+                edge = y;
             }
 
 //            this.rectangle.set(x, y, 30, 30);
