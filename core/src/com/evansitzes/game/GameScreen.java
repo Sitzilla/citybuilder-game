@@ -89,10 +89,8 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
         skin = new Skin(Gdx.files.internal("skins/uiskin.json"));
 
         camera = new OrthographicCamera();
-//        camera.setToOrtho(false, Gdx.graphics.getWidth() / Configuration.WIDTH_MODIFIER, Gdx.graphics.getHeight() / Configuration.HEIGHT_MODIFIER);
         camera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         camera.update();
-//        tiledMap = new TmxMapLoader().load("maps/basic-level1.tmx");
         this.level = TmxLevelLoader.load(Vector2.Zero, game, this, "test-map");
         TILE_SIZE = (int) (level.tileHeight);
 //        bulldozingPixmap = new Pixmap(Gdx.files.internal("sidebar/bulldozer.png"));
@@ -100,8 +98,7 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
 
         // Load State
         buildings = StateHelper.loadBuildingsState(game);
-        tilesMap = StateHelper.loadTilesState(level.mapWidth, level.mapHeight, level.tileHeight, level.tileWidth);
-//        tilesMap = new TilesMap(w, h, level.tileHeight, level.tileWidth);
+        tilesMap = StateHelper.loadTilesState(level.mapWidth, level.mapHeight, level.tileHeight, level.tileWidth, buildings);
 
         this.tiledMapRenderer = new OrthogonalTiledMapRenderer(level.map);
         tiledMapRenderer.setView(camera);
@@ -319,7 +316,8 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
                 building.y = currentTileY;
 
                 buildings.add(building);
-                spriteHandler.setBuildings(buildings);
+                setTileBuilding(building);
+//                spriteHandler.setBuildings(buildings);
                 setAreDevelopedTiles(true);
             }
 
@@ -330,7 +328,8 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
                 for (final Building building : buildings) {
                     if (building.overhangs(currentTileX, currentTileY)) {
                         buildings.remove(building);
-                        spriteHandler.setBuildings(buildings);
+                        setTileBuilding(null);
+//                        spriteHandler.setBuildings(buildings);
                         //TODO tile size
 //                        setCornerTileFromMiddleArea((int) getMousePositionInGameWorld().x, (int) getMousePositionInGameWorld().y, building.tileSize);
                         currentImageTilesize = building.tileSize;
@@ -392,6 +391,14 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
         for (int i = 0; i < currentImageTilesize; i++) {
             for (int j = 0; j < currentImageTilesize; j++) {
                 tilesMap.getTile(currentTileX / TILE_SIZE + i, currentTileY / TILE_SIZE + j).setOccupied(isOccupied);
+            }
+        }
+    }
+
+    private void setTileBuilding(final Building building) {
+        for (int i = 0; i < currentImageTilesize; i++) {
+            for (int j = 0; j < currentImageTilesize; j++) {
+                tilesMap.getTile(currentTileX / TILE_SIZE + i, currentTileY / TILE_SIZE + j).setBuilding(building);
             }
         }
     }

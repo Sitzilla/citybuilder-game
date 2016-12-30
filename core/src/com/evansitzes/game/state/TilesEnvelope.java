@@ -1,6 +1,5 @@
 package com.evansitzes.game.state;
 
-import com.evansitzes.game.environment.Tile;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.ArrayList;

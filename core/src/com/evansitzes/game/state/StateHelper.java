@@ -3,7 +3,7 @@ package com.evansitzes.game.state;
 import com.badlogic.gdx.Gdx;
 import com.evansitzes.game.CityBuildingGame;
 import com.evansitzes.game.buildings.Building;
-import com.evansitzes.game.environment.Tile;
+import com.evansitzes.game.environment.EnhancedTile;
 import com.evansitzes.game.environment.TilesMap;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
@@ -77,7 +77,7 @@ public class StateHelper {
         }
     }
 
-    public static TilesMap loadTilesState(final float mapWidth, final float mapHeight, final int tileHeight, final int tileWidth) {
+    public static TilesMap loadTilesState(final float mapWidth, final float mapHeight, final int tileHeight, final int tileWidth, final ArrayList<Building> buildings) {
         final ObjectMapper mapper = new ObjectMapper(new YAMLFactory()); // jackson databind
         mapper.registerModule(new JodaModule());
 
@@ -87,10 +87,21 @@ public class StateHelper {
 
             // If an empty map they initialize a new empty Tiles Map
             if (tilesEnvelope.getTiles() == null) {
-                return new TilesMap(mapWidth * tileWidth, mapHeight * tileHeight, tileHeight, tileWidth);
+                final TilesMap tilesMap = new TilesMap(mapWidth * tileWidth, mapHeight * tileHeight, tileHeight, tileWidth);
+                tilesMap.addAllBuildings(buildings);
+                return tilesMap;
             }
 
-            return new TilesMap(tilesEnvelope.getTiles(), mapWidth * tileWidth, mapHeight * tileHeight, tileHeight, tileWidth);
+            // Change all Tiles objects to EnhancedTile objects
+            final ArrayList<EnhancedTile> enhancedTiles = new ArrayList<EnhancedTile>();
+            for (final Tile tile : tilesEnvelope.getTiles()) {
+                enhancedTiles.add(new EnhancedTile(tile));
+            }
+
+            final TilesMap tilesMap = new TilesMap(enhancedTiles, mapWidth * tileWidth, mapHeight * tileHeight, tileHeight, tileWidth);
+            tilesMap.addAllBuildings(buildings);
+
+            return tilesMap;
 
         } catch (final IOException e) {
             System.out.println(e);

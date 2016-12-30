@@ -1,4 +1,4 @@
-package com.evansitzes.game.environment;
+package com.evansitzes.game.state;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -14,6 +14,9 @@ public class Tile {
 
     @JsonProperty
     private boolean occupied;
+
+//    @JsonProperty
+//    private Building building;
 
     public Tile() {
 
@@ -47,4 +50,12 @@ public class Tile {
     public void setOccupied(final boolean occupied) {
         this.occupied = occupied;
     }
+
+//    public Building getBuilding() {
+//        return building;
+//    }
+//
+//    public void setBuilding(final Building building) {
+//        this.building = building;
+//    }
 }
