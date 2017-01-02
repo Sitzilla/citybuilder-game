@@ -20,6 +20,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.evansitzes.game.buildings.Building;
 import com.evansitzes.game.environment.Level;
 import com.evansitzes.game.environment.TilesMap;
+import com.evansitzes.game.helpers.Direction;
 import com.evansitzes.game.helpers.TextHelper;
 import com.evansitzes.game.people.*;
 import com.evansitzes.game.state.StateHelper;
@@ -411,17 +412,27 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
     public void createNewSprite(final String name, final int x, final int y, final int buildingSize) {
         System.out.println("Generating new sprite");
 
-        Person.Facing direction = SpriteHelper.getRandomValidDirection(x, y, buildingSize, null, TILE_SIZE, tilesMap);
+        Direction direction = SpriteHelper.getRandomValidDirection(x, y, buildingSize, null, TILE_SIZE, tilesMap);
 
         System.out.println(direction);
+        if (direction == null || direction.facingDirection == null) {
+            System.out.println("Building isnt connected to a road!!");
+            return;
+        }
 
-        spriteMovementHandler.addSpriteToList(SpriteGenerator.generatePerson(game,
+        final Person newPerson = SpriteGenerator.generatePerson(game,
                 this,
                 TILE_SIZE,
                 tilesMap,
                 name,
-                getNextXCornerTileFromDirection(x, TILE_SIZE, buildingSize, direction),
-                getNextYCornerTileFromDirection(y, TILE_SIZE, buildingSize, direction)));
+                getNextXCornerTileFromDirection(x, TILE_SIZE, buildingSize, direction.directionIndex, direction.facingDirection),
+                getNextYCornerTileFromDirection(y, TILE_SIZE, buildingSize, direction.directionIndex, direction.facingDirection));
+
+        if (newPerson == null) {
+            return;
+        }
+
+        spriteMovementHandler.addSpriteToList(newPerson);
     }
 
     private Vector3 getMousePositionInGameWorld() {

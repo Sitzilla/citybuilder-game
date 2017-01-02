@@ -5,7 +5,6 @@ import com.evansitzes.game.GameScreen;
 import com.evansitzes.game.environment.TilesMap;
 
 import static com.evansitzes.game.people.Person.Facing.DOWN;
-import static com.evansitzes.game.people.Person.Facing.UP;
 
 /**
  * Created by evan on 12/30/16.
@@ -23,7 +22,13 @@ public class SpriteGenerator {
         person.currentBuilding = tilesMap.getTile(person.currentTileX / TILE_SIZE, person.currentTileY / TILE_SIZE).getBuilding();
         // TODO hardcoded to down
         //TODO remove Rectangle extension so we dont have to cast to ints everywhere
-        person.nextDirection = SpriteHelper.getRandomValidDirection(person.x, person.y, 1, UP, TILE_SIZE, tilesMap);
+        person.nextDirection = SpriteHelper.getRandomValidDirection(person.x, person.y, 1, null, TILE_SIZE, tilesMap);
+
+        //TODO alert message to player
+        if (!person.currentBuilding.name.equals("road")) {
+            System.out.println("Building isnt connected to a road!!");
+            return null;
+        }
 
         return person;
     }

@@ -5,6 +5,7 @@ import com.evansitzes.game.Configuration;
 import com.evansitzes.game.GameScreen;
 import com.evansitzes.game.Textures;
 import com.evansitzes.game.buildings.Building;
+import com.evansitzes.game.helpers.Direction;
 
 import static com.evansitzes.game.people.Person.Facing.DOWN;
 import static com.evansitzes.game.people.Person.Facing.RIGHT;
@@ -27,7 +28,7 @@ public class Person extends Entity {
     public String name;
 
     public Building currentBuilding;
-    public Facing nextDirection;
+    public Direction nextDirection;
     public int currentTileX;
     public int currentTileY;
 

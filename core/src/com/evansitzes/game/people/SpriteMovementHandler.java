@@ -62,7 +62,7 @@ public class SpriteMovementHandler {
             }
 
             // Keep walking straight
-            if (person.nextDirection == person.direction) {
+            if (person.nextDirection.facingDirection == person.direction) {
                 final int newTileX = getXCornerTileFromMiddleArea(person.x, TILE_SIZE);
                 final int newTileY = getYCornerTileFromMiddleArea(person.y, TILE_SIZE);
 
@@ -88,7 +88,7 @@ public class SpriteMovementHandler {
 
 
             // Start walking a new direction
-            person.direction = person.nextDirection;
+            person.direction = person.nextDirection.facingDirection;
             //TODO wtf is this?
             person.nextDirection = person.nextDirection;
 //            nextDirection = getRandomValidDirection((int) person.x, (int) person.y, reverseDirection(currentDirection));

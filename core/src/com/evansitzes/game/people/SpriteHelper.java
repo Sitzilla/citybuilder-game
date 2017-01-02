@@ -2,19 +2,21 @@ package com.evansitzes.game.people;
 
 import com.evansitzes.game.buildings.Building;
 import com.evansitzes.game.environment.TilesMap;
+import com.evansitzes.game.helpers.Direction;
+import com.evansitzes.game.people.Person.Facing;
 
 import java.util.ArrayList;
 import java.util.Random;
 
-import static com.evansitzes.game.people.Person.Facing.DOWN;
+import static com.evansitzes.game.people.Person.Facing.*;
 
 /**
  * Created by evan on 12/30/16.
  */
 public class SpriteHelper {
 
-    public static Person.Facing getRandomValidDirection(final int xPixels, final int yPixels, final int buildingSize, final Person.Facing directionSpriteCameFrom, final int TILE_SIZE, final TilesMap tilesMap) {
-        final ArrayList<Person.Facing> directions = getAllAvailableRoads(xPixels, yPixels, buildingSize, directionSpriteCameFrom, TILE_SIZE, tilesMap);
+    public static Direction getRandomValidDirection(final int xPixels, final int yPixels, final int buildingSize, final Facing directionSpriteCameFrom, final int TILE_SIZE, final TilesMap tilesMap) {
+        final ArrayList<Direction> directions = getAllAvailableRoads(xPixels, yPixels, buildingSize, directionSpriteCameFrom, TILE_SIZE, tilesMap);
 
 //        System.out.println("Available directions: ");
 //        for (Person.Facing facing : directions) {
@@ -38,10 +40,10 @@ public class SpriteHelper {
         return screenY / TILE_SIZE * TILE_SIZE;
     }
 
-    public static int getNextXCornerTileFromDirection(final int x, final int TILE_SIZE, final int buildingSize, final Person.Facing direction) {
+    public static int getNextXCornerTileFromDirection(final int x, final int TILE_SIZE, final int buildingSize, int directionIndex, final Facing direction) {
         switch (direction) {
-            case DOWN: return x;
-            case UP: return x;
+            case DOWN: return x + (TILE_SIZE * directionIndex);
+            case UP: return x + (TILE_SIZE * directionIndex);
             case RIGHT: return x + (TILE_SIZE * buildingSize);
             case LEFT: return x - TILE_SIZE;
         }
@@ -50,42 +52,58 @@ public class SpriteHelper {
         return 0;
     }
 
-    public static int getNextYCornerTileFromDirection(final int y, final int TILE_SIZE, final int buildingSize, final Person.Facing direction) {
+    public static int getNextYCornerTileFromDirection(final int y, final int TILE_SIZE, final int buildingSize, int directionIndex, final Facing direction) {
         switch (direction) {
             case DOWN: return y - TILE_SIZE;
             case UP: return y + (TILE_SIZE * buildingSize);
-            case RIGHT: return y;
-            case LEFT: return y;
+            case RIGHT: return y + (TILE_SIZE * directionIndex);
+            case LEFT: return y + (TILE_SIZE * directionIndex);
         }
 
         //TODO should throw an error here
         return 0;
     }
 
-    private static ArrayList<Person.Facing> getAllAvailableRoads(final int xPixels, final int yPixels, final int buildingSize, final Person.Facing directionSpriteCameFrom, final int TILE_SIZE, final TilesMap tilesMap) {
-        final ArrayList<Person.Facing> facing = new ArrayList<Person.Facing>();
+    private static ArrayList<Direction> getAllAvailableRoads(final int xPixels, final int yPixels, final int buildingSize, final Facing directionSpriteCameFrom, final int TILE_SIZE, final TilesMap tilesMap) {
+        final ArrayList<Direction> directions = new ArrayList<Direction>();
 
-        // Check DOWN square
-        if (directionSpriteCameFrom != DOWN && isNextTileIsRoad(xPixels, yPixels - TILE_SIZE, TILE_SIZE, tilesMap)) {
-            facing.add(DOWN);
+        // Check DOWN squares
+        if (directionSpriteCameFrom != DOWN) {
+            for (int i = 0; i < buildingSize; i++) {
+                if (isNextTileIsRoad(xPixels + (TILE_SIZE * i), yPixels - TILE_SIZE, TILE_SIZE, tilesMap)) {
+                    directions.add(new Direction(i, DOWN));
+                }
+            }
         }
 
-        // Check UP square
-        if (directionSpriteCameFrom != Person.Facing.UP && isNextTileIsRoad(xPixels, yPixels + (TILE_SIZE * buildingSize), TILE_SIZE, tilesMap)) {
-            facing.add(Person.Facing.UP);
+        // Check UP squares
+        if (directionSpriteCameFrom != UP) {
+            for (int i = 0; i < buildingSize; i++) {
+                if (isNextTileIsRoad(xPixels + (TILE_SIZE * i), yPixels + (TILE_SIZE * buildingSize), TILE_SIZE, tilesMap)) {
+                    directions.add(new Direction(i, UP));
+                }
+            }
         }
 
-        // Check LEFT square
-        if (directionSpriteCameFrom != Person.Facing.LEFT && isNextTileIsRoad(xPixels - TILE_SIZE, yPixels, TILE_SIZE, tilesMap)) {
-            facing.add(Person.Facing.LEFT);
+        // Check LEFT squares
+        if (directionSpriteCameFrom != LEFT) {
+            for (int i = 0; i < buildingSize; i++) {
+                if (isNextTileIsRoad(xPixels - TILE_SIZE, yPixels + (TILE_SIZE * i), TILE_SIZE, tilesMap)) {
+                    directions.add(new Direction(i, LEFT));
+                }
+            }
         }
 
-        // Check RIGHT square
-        if (directionSpriteCameFrom != Person.Facing.RIGHT && isNextTileIsRoad(xPixels + (TILE_SIZE * buildingSize), yPixels, TILE_SIZE, tilesMap)) {
-            facing.add(Person.Facing.RIGHT);
+        // Check RIGHT squares
+        if (directionSpriteCameFrom != RIGHT) {
+            for (int i = 0; i < buildingSize; i++) {
+                if (isNextTileIsRoad(xPixels + (TILE_SIZE * buildingSize), yPixels + (TILE_SIZE * i), TILE_SIZE, tilesMap)) {
+                    directions.add(new Direction(i, RIGHT));
+                }
+            }
         }
 
-        return facing;
+        return directions;
     }
 
     private static boolean isNextTileIsRoad(final int xPixels, final int yPixels, final int TILE_SIZE, final TilesMap tilesMap) {
