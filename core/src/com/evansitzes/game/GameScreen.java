@@ -354,11 +354,12 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
                 for (final Building building : buildings) {
                     if (building.overhangs(currentTileX, currentTileY)) {
                         buildings.remove(building);
-                        setTileBuilding(null);
 //                        spriteMovementHandler.setBuildings(buildings);
                         //TODO tile size
-//                        setCornerTileFromMiddleArea((int) getMousePositionInGameWorld().x, (int) getMousePositionInGameWorld().y, building.tileSize);
+                        currentTileX = building.x;
+                        currentTileY = building.y;
                         currentImageTilesize = building.tileSize;
+                        setTileBuilding(null);
                         setAreDevelopedTiles(false);
                         break;
                     }

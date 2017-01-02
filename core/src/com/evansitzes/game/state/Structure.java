@@ -14,10 +14,10 @@ public class Structure {
     private int tileSize;
 
     @JsonProperty
-    private float x;
+    private int x;
 
     @JsonProperty
-    private float y;
+    private int y;
 
     public Structure() {
     }
@@ -38,19 +38,19 @@ public class Structure {
         this.tileSize = tileSize;
     }
 
-    public float getX() {
+    public int getX() {
         return x;
     }
 
-    public void setX(float x) {
+    public void setX(int x) {
         this.x = x;
     }
 
-    public float getY() {
+    public int getY() {
         return y;
     }
 
-    public void setY(float y) {
+    public void setY(int y) {
         this.y = y;
     }
 
