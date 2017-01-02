@@ -57,7 +57,6 @@ public class TilesMap {
 
             for (int j = 0; j < xTiles.get(i).size(); j++) {
                 final Tile tile = new Tile(i, j);
-                System.out.println("Adding!");
                 tile.setOccupied(getTile(i, j).isOccupied());
                 flattenedTiles.add(tile);
             }
@@ -81,7 +80,6 @@ public class TilesMap {
                 for (final Building building : buildings) {
                     //TODO magic numbers
                     if (building.overhangs(xTiles.get(i).get(j).getX() * 32, xTiles.get(i).get(j).getY() * 32)) {
-                        System.out.println("Adding!");
                         xTiles.get(i).get(j).setBuilding(building);
                     }
 

@@ -14,13 +14,8 @@ public class SimpleSprite extends Entity {
     public SimpleSprite(final CityBuildingGame game, final TextureRegion texture) {
         super(game);
         sprite = new Sprite(texture);
-//        rectangle = new Rectangle();
-//        rectangle.width = sprite.getWidth();
-//        rectangle.height = sprite.getHeight();
-
     }
 
-//    @Override
     public void handle(float delta) {
         sprite.setPosition(x, y);
         sprite.draw(game.batch);

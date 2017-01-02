@@ -20,12 +20,15 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.evansitzes.game.buildings.Building;
 import com.evansitzes.game.environment.Level;
 import com.evansitzes.game.environment.TilesMap;
+import com.evansitzes.game.helpers.Direction;
 import com.evansitzes.game.helpers.TextHelper;
-import com.evansitzes.game.people.Person;
-import com.evansitzes.game.people.SpriteHandler;
+import com.evansitzes.game.people.*;
 import com.evansitzes.game.state.StateHelper;
 
 import java.util.ArrayList;
+
+import static com.evansitzes.game.people.SpriteHelper.getNextXCornerTileFromDirection;
+import static com.evansitzes.game.people.SpriteHelper.getNextYCornerTileFromDirection;
 
 
 /**
@@ -70,7 +73,6 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
     private int currentTileY;
 
     private final ArrayList<Building> buildings;
-    private final Person person;
 //    private final ArrayList<Tile> tilesMap = new ArrayList<Tile>();
 //    private final TreeSet<Integer> developedXTiles = new TreeSet<Integer>();
 //    private final TreeSet<Integer> developedYTiles = new TreeSet<Integer>();
@@ -78,7 +80,8 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
     private final CityBuildingGame game;
     private final GameflowController gameflowController;
 
-    private final SpriteHandler spriteHandler;
+    private final SpriteStateHandler spriteStateHandler;
+    private final SpriteMovementHandler spriteMovementHandler;
 
     public GameScreen(final CityBuildingGame game, final GameflowController gameflowController) {
         this.game = game;
@@ -110,16 +113,28 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
 
         // TODO externalize this
         final TextButton saveButton = new TextButton("Save", skin);
-        final Button imgButton = new Button(new Image(Textures.Sidebar.HOUSE), skin);
+        final Button houseButton = new Button(new Image(Textures.Sidebar.HOUSE), skin);
+        final Button guardHouseButton = new Button(new Image(Textures.Sidebar.GUARD_HOUSE), skin);
         final Button roadButton = new Button(new Image(Textures.Road.VERTICLE_ROAD), skin);
         final Button bulldozeButton = new Button(new Image(Textures.Sidebar.BULLDOZER), skin);
 
-        imgButton.addListener(new ClickListener() {
+        houseButton.addListener(new ClickListener() {
             @Override
             public void clicked(final InputEvent event, final float x, final float y) {
                 currentImageTilesize = 2;
                 currentBuildingName = "house";
                 selectedBuildingImage = new TextureRegionDrawable((Textures.Sidebar.HOUSE));
+                buildingSelected = true;
+                bulldozingEnabled = false;
+            }
+        });
+
+        guardHouseButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(final InputEvent event, final float x, final float y) {
+                currentImageTilesize = 2;
+                currentBuildingName = "guard_house";
+                selectedBuildingImage = new TextureRegionDrawable((Textures.Sidebar.GUARD_HOUSE));
                 buildingSelected = true;
                 bulldozingEnabled = false;
             }
@@ -165,7 +180,9 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
 //        table.setFillParent(true);
         entireScreenTable.setBackground(sidebarDrawable);
 
-        sidebarTable.add(imgButton);
+        sidebarTable.add(houseButton);
+        sidebarTable.add(guardHouseButton);
+        sidebarTable.row();
         sidebarTable.add(roadButton);
         sidebarTable.add(saveButton);
         sidebarTable.add(bulldozeButton);
@@ -193,8 +210,8 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
 
 
         // Create sprites
-        person = new Person(game, this);
-        spriteHandler = new SpriteHandler(game, person, TILE_SIZE, tilesMap);
+        spriteStateHandler = new SpriteStateHandler(game, buildings, this);
+        spriteMovementHandler = new SpriteMovementHandler(game, TILE_SIZE, tilesMap);
     }
 
     @Override
@@ -246,7 +263,8 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
             building.draw();
         }
 
-        spriteHandler.handleSprite(delta);
+        spriteStateHandler.handleSpritesStates();
+        spriteMovementHandler.handleAllSprites(delta);
 
         game.batch.end();
 
@@ -258,6 +276,13 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
 
     @Override
     public boolean keyDown(final int keycode) {
+
+        // Generate new sprite
+        if (keycode == Input.Keys.ENTER) {
+            System.out.println("Generating new sprite");
+            spriteMovementHandler.addSpriteToList(SpriteGenerator.generatePerson(game, this, TILE_SIZE, tilesMap, "basic_person", 385, 500));
+        }
+
         if(keycode == Input.Keys.LEFT)
             camera.translate(-32,0);
         if(keycode == Input.Keys.RIGHT)
@@ -316,8 +341,9 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
                 building.y = currentTileY;
 
                 buildings.add(building);
+//                spriteStateHandler.refreshBuildings
                 setTileBuilding(building);
-//                spriteHandler.setBuildings(buildings);
+//                spriteMovementHandler.setBuildings(buildings);
                 setAreDevelopedTiles(true);
             }
 
@@ -329,7 +355,7 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
                     if (building.overhangs(currentTileX, currentTileY)) {
                         buildings.remove(building);
                         setTileBuilding(null);
-//                        spriteHandler.setBuildings(buildings);
+//                        spriteMovementHandler.setBuildings(buildings);
                         //TODO tile size
 //                        setCornerTileFromMiddleArea((int) getMousePositionInGameWorld().x, (int) getMousePositionInGameWorld().y, building.tileSize);
                         currentImageTilesize = building.tileSize;
@@ -381,6 +407,32 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
     @Override
     public void hide() {
 
+    }
+
+    public void createNewSprite(final String name, final int x, final int y, final int buildingSize) {
+        System.out.println("Generating new sprite");
+
+        Direction direction = SpriteHelper.getRandomValidDirection(x, y, buildingSize, null, TILE_SIZE, tilesMap);
+
+        System.out.println(direction);
+        if (direction == null || direction.facingDirection == null) {
+            System.out.println("Building isnt connected to a road!!");
+            return;
+        }
+
+        final Person newPerson = SpriteGenerator.generatePerson(game,
+                this,
+                TILE_SIZE,
+                tilesMap,
+                name,
+                getNextXCornerTileFromDirection(x, TILE_SIZE, buildingSize, direction.directionIndex, direction.facingDirection),
+                getNextYCornerTileFromDirection(y, TILE_SIZE, buildingSize, direction.directionIndex, direction.facingDirection));
+
+        if (newPerson == null) {
+            return;
+        }
+
+        spriteMovementHandler.addSpriteToList(newPerson);
     }
 
     private Vector3 getMousePositionInGameWorld() {

@@ -24,12 +24,12 @@ public class AnimatedSprite extends Entity {
     private final boolean looping = true;
     private final float animationSpeed = 1f/5f;
 
-    public AnimatedSprite(final CityBuildingGame game) {
+    public AnimatedSprite(final CityBuildingGame game, final String name) {
         super(game);
-        upWalking = Textures.People.WALKING_UP;
-        downWalking = Textures.People.WALKING_DOWN;
-        rightWalking = Textures.People.WALKING_RIGHT;
-        leftWalking = Textures.People.WALKING_LEFT;
+        upWalking = Textures.People.loadWalkingUp(name);
+        downWalking = Textures.People.loadWalkingDown(name);
+        rightWalking = Textures.People.loadWalkingRight(name);
+        leftWalking = Textures.People.loadWalkingLeft(name);
 
         this.game = game;
 
