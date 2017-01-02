@@ -11,55 +11,62 @@ public class Textures {
 
     public static class Sidebar {
         public static final TextureRegion BACKGROUND = loadBackground();
-        public static final TextureRegion HOUSE = loadHouse()[0][0];
+        public static final TextureRegion HOUSE = loadHouse();
+        public static final TextureRegion GUARD_HOUSE = loadGuardhouse();
         public static final TextureRegion BULLDOZER = loadBulldozer();
 
     }
 
     public static class People {
-        public static final TextureRegion STANDING = loadSprite()[0][1];
+//        public static final TextureRegion STANDING = loadSprite()[0][1];
 
-        public static final TextureRegion[] WALKING_RIGHT = loadWalkingRight();
-        public static final TextureRegion[] WALKING_LEFT = loadWalkingLeft();
-        public static final TextureRegion[] WALKING_UP = loadWalkingUp();
-        public static final TextureRegion[] WALKING_DOWN = loadWalkingDown();
+//        public static final TextureRegion[] WALKING_RIGHT = loadWalkingRight();
+//        public static final TextureRegion[] WALKING_LEFT = loadWalkingLeft();
+//        public static final TextureRegion[] WALKING_UP = loadWalkingUp();
+//        public static final TextureRegion[] WALKING_DOWN = loadWalkingDown();
 
-        private static TextureRegion[] loadWalkingLeft() {
-            return loadWalking(1);
+        public static TextureRegion loadStandingSprite(final String spriteFile) {
+            return loadSprite(spriteFile)[0][1];
         }
 
-        private static TextureRegion[] loadWalkingRight() { return loadWalking(2); }
-
-        private static TextureRegion[] loadWalkingUp() {
-            return loadWalking(3);
+        public static TextureRegion[] loadWalkingLeft(final String spriteFile) {
+            return loadWalking(1, loadSprite(spriteFile));
         }
 
-        private static TextureRegion[] loadWalkingDown() {
-            return loadWalking(0);
+        public static TextureRegion[] loadWalkingRight(final String spriteFile) {
+            return loadWalking(2, loadSprite(spriteFile));
         }
 
-        private static TextureRegion[] loadWalking(final int index) {
+        public static TextureRegion[] loadWalkingUp(final String spriteFile) {
+            return loadWalking(3, loadSprite(spriteFile));
+        }
+
+        public static TextureRegion[] loadWalkingDown(final String spriteFile) {
+            return loadWalking(0, loadSprite(spriteFile));
+        }
+
+        private static TextureRegion[] loadWalking(final int index, final TextureRegion[][] walkingTextureRegion) {
 //            final TextureRegion[] walkingFrames = new TextureRegion[3];
             final TextureRegion[] walkingFrames = new TextureRegion[4];
-            final TextureRegion[][] tmp = loadSprite();
+//            final TextureRegion[][] tmp = loadSprite();
 
 //            for (int i = 0; i < 3; i++) {
 //                walkingFrames[i] = tmp[index][i];
 //            }
 
-            walkingFrames[0] = tmp[index][0];
-            walkingFrames[1] = tmp[index][1];
-            walkingFrames[2] = tmp[index][2];
-            walkingFrames[3] = tmp[index][1];
+            walkingFrames[0] = walkingTextureRegion[index][0];
+            walkingFrames[1] = walkingTextureRegion[index][1];
+            walkingFrames[2] = walkingTextureRegion[index][2];
+            walkingFrames[3] = walkingTextureRegion[index][1];
 
             return walkingFrames;
         }
 
-        private static TextureRegion[][] loadSprite() {
+        private static TextureRegion[][] loadSprite(final String spriteFile) {
             final int frameColumns = 3;
             final int frameRows = 4;
 
-            return splitTextureRegion(frameColumns, frameRows, new Texture(Gdx.files.internal("people/basic_person.png")));
+            return splitTextureRegion(frameColumns, frameRows, new Texture(Gdx.files.internal("people/" + spriteFile + ".png")));
         }
 
 
@@ -98,11 +105,18 @@ public class Textures {
         return splitTextureRegion(frameColumns, frameRows, new Texture(Gdx.files.internal("sidebar/top_bar.png")))[0][0];
     }
 
-    private static TextureRegion[][] loadHouse() {
-        final int frameColumns = 24;
-        final int frameRows = 30;
+    private static TextureRegion loadHouse() {
+        final int frameColumns = 1;
+        final int frameRows = 1;
 
-        return splitTextureRegion(frameColumns, frameRows, new Texture(Gdx.files.internal("buildings/build.png")));
+        return splitTextureRegion(frameColumns, frameRows, new Texture(Gdx.files.internal("buildings/house.png")))[0][0];
+    }
+
+    private static TextureRegion loadGuardhouse() {
+        final int frameColumns = 1;
+        final int frameRows = 1;
+
+        return splitTextureRegion(frameColumns, frameRows, new Texture(Gdx.files.internal("buildings/guard_house.png")))[0][0];
     }
 
     private static TextureRegion loadBulldozer() {

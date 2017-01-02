@@ -24,6 +24,7 @@ public class Person extends Entity {
 
     public int edge;
     public State state;
+    public String name;
 
     public Building currentBuilding;
     public Facing nextDirection;
@@ -41,22 +42,23 @@ public class Person extends Entity {
     public Facing direction;
 
 
-    public Person(final CityBuildingGame game, final GameScreen screen) {
+    public Person(final CityBuildingGame game, final GameScreen screen, final String name, final int x, final int y) {
         super(game);
+        this.name = name;
         this.screen = screen;
         this.state = IDLE;
         direction = DOWN;
 //        configuration = new Configuration();
 
-        currentSprite = new SimpleSprite(game, Textures.People.STANDING);
-        animatedSprite = new AnimatedSprite(game);
+        currentSprite = new SimpleSprite(game, Textures.People.loadStandingSprite(name));
+        animatedSprite = new AnimatedSprite(game, name);
 
 
 //        position.x = new Configuration().STARTING_POSITION_X;
 //        position.y = new Configuration().STARTING_POSITION_Y;
-        locate(385, 500);
-        animatedSprite.locate(385, 500);
-        currentSprite.locate(385, 500);
+        locate(x, y);
+        animatedSprite.locate(x, y);
+        currentSprite.locate(x, y);
 //        animatedSprite.position.set(385, 500, 0);
 //        currentSprite.position.set(385, 500, 0);
 

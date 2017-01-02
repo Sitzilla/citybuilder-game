@@ -13,14 +13,14 @@ import static com.evansitzes.game.people.SpriteHelper.*;
 /**
  * Created by evan on 12/29/16.
  */
-public class SpriteHandler {
+public class SpriteMovementHandler {
     private CityBuildingGame game;
     private ArrayList<Person> persons;
     private static int TILE_SIZE;
     private TilesMap tilesMap;
 //    private ArrayList<Building> buildings;
 
-    public SpriteHandler(final CityBuildingGame game, final int TILE_SIZE, final TilesMap tilesMap) {
+    public SpriteMovementHandler(final CityBuildingGame game, final int TILE_SIZE, final TilesMap tilesMap) {
         this.game = game;
         this.TILE_SIZE = TILE_SIZE;
         this.tilesMap = tilesMap;
@@ -76,7 +76,7 @@ public class SpriteHandler {
                 // Entering new square. Keep walking straight but assign new random direction
                 person.currentTileX = getXCornerTileFromMiddleArea(person.x, TILE_SIZE);
                 person.currentTileY = getYCornerTileFromMiddleArea(person.y, TILE_SIZE);
-                person.nextDirection = getRandomValidDirection(person.x, person.y, reverseDirection(person.direction), TILE_SIZE, tilesMap);
+                person.nextDirection = getRandomValidDirection(person.x, person.y, person.currentBuilding.tileSize, reverseDirection(person.direction), TILE_SIZE, tilesMap);
                 person.state = State.WALKING;
                 person.handle(delta);
                 return;

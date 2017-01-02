@@ -18,6 +18,7 @@ public class Building extends Rectangle {
     public final Vector3 position = new Vector3();
     public Rectangle rectangle;
     public int tileSize;
+    public int spritesGenerated;
 
     public Building(final CityBuildingGame game, final int tileSize, final String name) {
         this.game = game;
@@ -64,6 +65,10 @@ public class Building extends Rectangle {
 
         if (name.equals("road")) {
             return Textures.Road.VERTICLE_ROAD;
+        }
+
+        if (name.equals("guard_house")) {
+            return Textures.Sidebar.GUARD_HOUSE;
         }
 
         //TODO should throw an error

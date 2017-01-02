@@ -13,8 +13,8 @@ import static com.evansitzes.game.people.Person.Facing.DOWN;
  */
 public class SpriteHelper {
 
-    public static Person.Facing getRandomValidDirection(final int xPixels, final int yPixels, final Person.Facing directionSpriteCameFrom, final int TILE_SIZE, final TilesMap tilesMap) {
-        final ArrayList<Person.Facing> directions = getAllAvailableRoads(xPixels, yPixels, directionSpriteCameFrom, TILE_SIZE, tilesMap);
+    public static Person.Facing getRandomValidDirection(final int xPixels, final int yPixels, final int buildingSize, final Person.Facing directionSpriteCameFrom, final int TILE_SIZE, final TilesMap tilesMap) {
+        final ArrayList<Person.Facing> directions = getAllAvailableRoads(xPixels, yPixels, buildingSize, directionSpriteCameFrom, TILE_SIZE, tilesMap);
 
 //        System.out.println("Available directions: ");
 //        for (Person.Facing facing : directions) {
@@ -38,7 +38,31 @@ public class SpriteHelper {
         return screenY / TILE_SIZE * TILE_SIZE;
     }
 
-    private static ArrayList<Person.Facing> getAllAvailableRoads(final int xPixels, final int yPixels, final Person.Facing directionSpriteCameFrom, final int TILE_SIZE, final TilesMap tilesMap) {
+    public static int getNextXCornerTileFromDirection(final int x, final int TILE_SIZE, final int buildingSize, final Person.Facing direction) {
+        switch (direction) {
+            case DOWN: return x;
+            case UP: return x;
+            case RIGHT: return x + (TILE_SIZE * buildingSize);
+            case LEFT: return x - TILE_SIZE;
+        }
+
+        //TODO should throw an error here
+        return 0;
+    }
+
+    public static int getNextYCornerTileFromDirection(final int y, final int TILE_SIZE, final int buildingSize, final Person.Facing direction) {
+        switch (direction) {
+            case DOWN: return y - TILE_SIZE;
+            case UP: return y + (TILE_SIZE * buildingSize);
+            case RIGHT: return y;
+            case LEFT: return y;
+        }
+
+        //TODO should throw an error here
+        return 0;
+    }
+
+    private static ArrayList<Person.Facing> getAllAvailableRoads(final int xPixels, final int yPixels, final int buildingSize, final Person.Facing directionSpriteCameFrom, final int TILE_SIZE, final TilesMap tilesMap) {
         final ArrayList<Person.Facing> facing = new ArrayList<Person.Facing>();
 
         // Check DOWN square
@@ -47,7 +71,7 @@ public class SpriteHelper {
         }
 
         // Check UP square
-        if (directionSpriteCameFrom != Person.Facing.UP && isNextTileIsRoad(xPixels, yPixels + TILE_SIZE, TILE_SIZE, tilesMap)) {
+        if (directionSpriteCameFrom != Person.Facing.UP && isNextTileIsRoad(xPixels, yPixels + (TILE_SIZE * buildingSize), TILE_SIZE, tilesMap)) {
             facing.add(Person.Facing.UP);
         }
 
@@ -57,7 +81,7 @@ public class SpriteHelper {
         }
 
         // Check RIGHT square
-        if (directionSpriteCameFrom != Person.Facing.RIGHT && isNextTileIsRoad(xPixels + TILE_SIZE, yPixels, TILE_SIZE, tilesMap)) {
+        if (directionSpriteCameFrom != Person.Facing.RIGHT && isNextTileIsRoad(xPixels + (TILE_SIZE * buildingSize), yPixels, TILE_SIZE, tilesMap)) {
             facing.add(Person.Facing.RIGHT);
         }
 
@@ -77,4 +101,5 @@ public class SpriteHelper {
         }
         return tilesMap.getTile(xPixels / TILE_SIZE, yPixels / TILE_SIZE).getBuilding().name.equals("road");
     }
+
 }

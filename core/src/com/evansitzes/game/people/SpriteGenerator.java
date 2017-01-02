@@ -12,8 +12,8 @@ import static com.evansitzes.game.people.Person.Facing.UP;
  */
 public class SpriteGenerator {
 
-    public static Person generatePerson(final CityBuildingGame game, final GameScreen screen, final int TILE_SIZE, final TilesMap tilesMap) {
-        final Person person = new Person(game, screen);
+    public static Person generatePerson(final CityBuildingGame game, final GameScreen screen, final int TILE_SIZE, final TilesMap tilesMap, final String name, final int x, final int y) {
+        final Person person = new Person(game, screen, name, x, y);
         person.state = Person.State.IDLE;
         person.direction = DOWN;
 
@@ -23,7 +23,7 @@ public class SpriteGenerator {
         person.currentBuilding = tilesMap.getTile(person.currentTileX / TILE_SIZE, person.currentTileY / TILE_SIZE).getBuilding();
         // TODO hardcoded to down
         //TODO remove Rectangle extension so we dont have to cast to ints everywhere
-        person.nextDirection = SpriteHelper.getRandomValidDirection(person.x, person.y, UP, TILE_SIZE, tilesMap);
+        person.nextDirection = SpriteHelper.getRandomValidDirection(person.x, person.y, 1, UP, TILE_SIZE, tilesMap);
 
         return person;
     }
