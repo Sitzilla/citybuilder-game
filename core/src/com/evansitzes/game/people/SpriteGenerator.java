@@ -25,7 +25,7 @@ public class SpriteGenerator {
         person.nextDirection = SpriteHelper.getRandomValidDirection(person.x, person.y, 1, null, TILE_SIZE, tilesMap);
 
         //TODO alert message to player
-        if (!person.currentBuilding.name.equals("road")) {
+        if (person.currentBuilding == null || !person.currentBuilding.name.equals("road")) {
             System.out.println("Building isnt connected to a road!!");
             return null;
         }

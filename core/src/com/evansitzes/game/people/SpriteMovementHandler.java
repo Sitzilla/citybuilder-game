@@ -56,9 +56,14 @@ public class SpriteMovementHandler {
 
             // No available adjacent road
             if (person.nextDirection == null) {
-                person.state = State.IDLE;
-                person.handle(delta);
-                return;
+
+                // Check the road behind
+                person.nextDirection = getRandomValidDirection(person.currentTileX, person.currentTileY, 1, null, TILE_SIZE, tilesMap);
+                if (person.nextDirection == null) {
+                    person.state = State.IDLE;
+                    person.handle(delta);
+                    return;
+                }
             }
 
             // Keep walking straight
@@ -89,8 +94,6 @@ public class SpriteMovementHandler {
 
             // Start walking a new direction
             person.direction = person.nextDirection.facingDirection;
-            //TODO wtf is this?
-            person.nextDirection = person.nextDirection;
 //            nextDirection = getRandomValidDirection((int) person.x, (int) person.y, reverseDirection(currentDirection));
             person.state = State.WALKING;
             person.handle(delta);
