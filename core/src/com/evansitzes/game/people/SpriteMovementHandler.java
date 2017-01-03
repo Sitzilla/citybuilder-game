@@ -2,12 +2,13 @@ package com.evansitzes.game.people;
 
 import com.evansitzes.game.CityBuildingGame;
 import com.evansitzes.game.environment.TilesMap;
-import com.evansitzes.game.people.Person.Facing;
-import com.evansitzes.game.people.Person.State;
+import com.evansitzes.game.people.sprites.Person;
+import com.evansitzes.game.people.sprites.Person.Facing;
+import com.evansitzes.game.people.sprites.Person.State;
 
 import java.util.ArrayList;
 
-import static com.evansitzes.game.people.Person.Facing.*;
+import static com.evansitzes.game.people.sprites.Person.Facing.*;
 import static com.evansitzes.game.people.SpriteHelper.*;
 
 /**
@@ -15,7 +16,6 @@ import static com.evansitzes.game.people.SpriteHelper.*;
  */
 public class SpriteMovementHandler {
     private CityBuildingGame game;
-    private ArrayList<Person> persons;
     private static int TILE_SIZE;
     private TilesMap tilesMap;
 //    private ArrayList<Building> buildings;
@@ -24,21 +24,26 @@ public class SpriteMovementHandler {
         this.game = game;
         this.TILE_SIZE = TILE_SIZE;
         this.tilesMap = tilesMap;
-        persons = new ArrayList<Person>();
-
     }
 
-    public void addSpriteToList(final Person person) {
-        persons.add(person);
-    }
-
-    public void handleAllSprites(final float delta) {
+    public void handlePatrollingSprites(final float delta, final ArrayList<Person> persons) {
         for (final Person person : persons) {
-            handleSprite(person, delta);
+            handlePatrollingSprite(person, delta);
         }
     }
 
-    public void handleSprite(final Person person, final float delta) {
+
+    public void handleReturningHomeSprites(final float delta, final ArrayList<Person> persons) {
+        for (final Person person : persons) {
+            handlePatrollingSprite(person, delta);
+        }
+    }
+
+    public void handleReturningHomeSprite(final Person person, final float delta) {
+
+    }
+
+    public void handlePatrollingSprite(final Person person, final float delta) {
 
         // Normal people can only walk on roads
         if (person.currentBuilding == null || !person.currentBuilding.name.equals("road")) {

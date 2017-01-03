@@ -1,4 +1,4 @@
-package com.evansitzes.game.people;
+package com.evansitzes.game.people.sprites;
 
 import com.evansitzes.game.CityBuildingGame;
 

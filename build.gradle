@@ -53,6 +53,7 @@ project(":core") {
         compile 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.7.4'
         compile 'com.fasterxml.jackson.core:jackson-databind:2.6.5'
         compile 'com.fasterxml.jackson.datatype:jackson-datatype-joda:2.1.1'
+        compile 'com.joda-time.joda-time:2.4'
     }
 }
 

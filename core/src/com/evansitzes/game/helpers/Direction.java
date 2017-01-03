@@ -1,6 +1,6 @@
 package com.evansitzes.game.helpers;
 
-import com.evansitzes.game.people.Person.Facing;
+import com.evansitzes.game.people.sprites.Person.Facing;
 
 /**
 Tuple for holding a location in a certain direction from nan (x, y) coordinate

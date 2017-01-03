@@ -1,4 +1,4 @@
-package com.evansitzes.game.people;
+package com.evansitzes.game.people.sprites;
 
 import com.evansitzes.game.CityBuildingGame;
 import com.evansitzes.game.Configuration;
@@ -7,9 +7,9 @@ import com.evansitzes.game.Textures;
 import com.evansitzes.game.buildings.Building;
 import com.evansitzes.game.helpers.Direction;
 
-import static com.evansitzes.game.people.Person.Facing.DOWN;
-import static com.evansitzes.game.people.Person.Facing.RIGHT;
-import static com.evansitzes.game.people.Person.State.IDLE;
+import static com.evansitzes.game.people.sprites.Person.Facing.DOWN;
+import static com.evansitzes.game.people.sprites.Person.Facing.RIGHT;
+import static com.evansitzes.game.people.sprites.Person.State.IDLE;
 
 /**
  * Created by evan on 12/29/16.
@@ -21,7 +21,9 @@ public class Person extends Entity {
     private final GameScreen screen;
     public SimpleSprite currentSprite;
     public AnimatedSprite animatedSprite;
+    public Building homeBuilding;
     Configuration configuration;
+
 
     public int edge;
     public State state;
@@ -43,11 +45,12 @@ public class Person extends Entity {
     public Facing direction;
 
 
-    public Person(final CityBuildingGame game, final GameScreen screen, final String name, final int x, final int y) {
+    public Person(final CityBuildingGame game, final GameScreen screen, final String name, final Building homeBuilding, final int x, final int y) {
         super(game);
         this.name = name;
         this.screen = screen;
         this.state = IDLE;
+        this.homeBuilding = homeBuilding;
         direction = DOWN;
 //        configuration = new Configuration();
 
@@ -106,10 +109,16 @@ public class Person extends Entity {
         }
     }
 
+    //TODO maybe make these abstract?
+    public boolean hasTimeInFieldExpired() {
+        return false;
+    }
+
+    public void setTimeInFieldHasExpired() {
+    }
+
     private void handleInput(final float delta) {
 
     }
 
-    private void checkBounds() {
-    }
 }

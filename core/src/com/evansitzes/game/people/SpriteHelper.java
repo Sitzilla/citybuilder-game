@@ -3,12 +3,12 @@ package com.evansitzes.game.people;
 import com.evansitzes.game.buildings.Building;
 import com.evansitzes.game.environment.TilesMap;
 import com.evansitzes.game.helpers.Direction;
-import com.evansitzes.game.people.Person.Facing;
+import com.evansitzes.game.people.sprites.Person.Facing;
 
 import java.util.ArrayList;
 import java.util.Random;
 
-import static com.evansitzes.game.people.Person.Facing.*;
+import static com.evansitzes.game.people.sprites.Person.Facing.*;
 
 /**
  * Created by evan on 12/30/16.

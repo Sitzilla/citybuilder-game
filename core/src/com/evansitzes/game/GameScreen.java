@@ -23,6 +23,7 @@ import com.evansitzes.game.environment.TilesMap;
 import com.evansitzes.game.helpers.Direction;
 import com.evansitzes.game.helpers.TextHelper;
 import com.evansitzes.game.people.*;
+import com.evansitzes.game.people.sprites.Person;
 import com.evansitzes.game.state.StateHelper;
 
 import java.util.ArrayList;
@@ -264,7 +265,8 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
         }
 
         spriteStateHandler.handleSpritesStates();
-        spriteMovementHandler.handleAllSprites(delta);
+        spriteMovementHandler.handlePatrollingSprites(delta, spriteStateHandler.getPatrollingPersons());
+        spriteMovementHandler.handleReturningHomeSprites(delta, spriteStateHandler.getReturningHomePersons());
 
         game.batch.end();
 
@@ -278,10 +280,10 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
     public boolean keyDown(final int keycode) {
 
         // Generate new sprite
-        if (keycode == Input.Keys.ENTER) {
-            System.out.println("Generating new sprite");
-            spriteMovementHandler.addSpriteToList(SpriteGenerator.generatePerson(game, this, TILE_SIZE, tilesMap, "basic_person", 385, 500));
-        }
+//        if (keycode == Input.Keys.ENTER) {
+//            System.out.println("Generating new sprite");
+//            spriteMovementHandler.addSpriteToList(SpriteGenerator.generatePerson(game, this, TILE_SIZE, tilesMap, "basic_person", 385, 500));
+//        }
 
         if(keycode == Input.Keys.LEFT)
             camera.translate(-32,0);
@@ -317,7 +319,7 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
                 if (isClickedSquareOccupied()) {
                     System.out.println("Show Dialog");
 
-                    BasicInformationPopup popup = new BasicInformationPopup("Building Info", skin);
+                    final BasicInformationPopup popup = new BasicInformationPopup("Building Info", skin);
                     stage.addActor(popup);
                 }
             }
@@ -410,10 +412,10 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
 
     }
 
-    public void createNewSprite(final String name, final int x, final int y, final int buildingSize) {
+    public void createNewSprite(final String name, final int x, final int y, final Building building) {
         System.out.println("Generating new sprite");
 
-        Direction direction = SpriteHelper.getRandomValidDirection(x, y, buildingSize, null, TILE_SIZE, tilesMap);
+        final Direction direction = SpriteHelper.getRandomValidDirection(x, y, building.tileSize, null, TILE_SIZE, tilesMap);
 
         System.out.println(direction);
         if (direction == null || direction.facingDirection == null) {
@@ -423,17 +425,18 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
 
         final Person newPerson = SpriteGenerator.generatePerson(game,
                 this,
+                building,
                 TILE_SIZE,
                 tilesMap,
                 name,
-                getNextXCornerTileFromDirection(x, TILE_SIZE, buildingSize, direction.directionIndex, direction.facingDirection),
-                getNextYCornerTileFromDirection(y, TILE_SIZE, buildingSize, direction.directionIndex, direction.facingDirection));
+                getNextXCornerTileFromDirection(x, TILE_SIZE, building.tileSize, direction.directionIndex, direction.facingDirection),
+                getNextYCornerTileFromDirection(y, TILE_SIZE, building.tileSize, direction.directionIndex, direction.facingDirection));
 
         if (newPerson == null) {
             return;
         }
 
-        spriteMovementHandler.addSpriteToList(newPerson);
+        spriteStateHandler.addSpriteToList(newPerson);
     }
 
     private Vector3 getMousePositionInGameWorld() {
