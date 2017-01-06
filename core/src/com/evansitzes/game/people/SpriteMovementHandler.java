@@ -15,10 +15,12 @@ import static com.evansitzes.game.people.SpriteHelper.*;
  * Created by evan on 12/29/16.
  */
 public class SpriteMovementHandler {
+
+    private static final int PIXELS_AWAY_FROM_EDGE_OF_TILE = 5;
+
     private CityBuildingGame game;
     private static int TILE_SIZE;
     private TilesMap tilesMap;
-//    private ArrayList<Building> buildings;
 
     public SpriteMovementHandler(final CityBuildingGame game, final int TILE_SIZE, final TilesMap tilesMap) {
         this.game = game;
@@ -53,11 +55,10 @@ public class SpriteMovementHandler {
         }
 
         // In the 'leave-square danger zone'
-        //TODO magic number
-        if ((person.direction == UP && person.edge > person.currentTileY + TILE_SIZE - 5)
-                || (person.direction == DOWN && person.edge < person.currentTileY + 5)
-                || (person.direction == RIGHT && person.edge > person.currentTileX + TILE_SIZE - 5)
-                || (person.direction == LEFT && person.edge < person.currentTileX + 5)) {
+        if ((person.direction == UP && person.edge > person.currentTileY + TILE_SIZE - PIXELS_AWAY_FROM_EDGE_OF_TILE)
+                || (person.direction == DOWN && person.edge < person.currentTileY + PIXELS_AWAY_FROM_EDGE_OF_TILE)
+                || (person.direction == RIGHT && person.edge > person.currentTileX + TILE_SIZE - PIXELS_AWAY_FROM_EDGE_OF_TILE)
+                || (person.direction == LEFT && person.edge < person.currentTileX + PIXELS_AWAY_FROM_EDGE_OF_TILE)) {
 
             // No available adjacent road
             if (person.nextDirection == null) {
