@@ -10,6 +10,7 @@ import java.util.ArrayList;
  */
 public class TilesMap {
 
+    //TODO  why in the world is this not just a 2D array??
     private ArrayList<ArrayList<EnhancedTile>> xTiles = new ArrayList<ArrayList<EnhancedTile>>();
 
     // Create new Tile Map from flattened list of tiles
@@ -47,7 +48,11 @@ public class TilesMap {
 
 
     public EnhancedTile getTile(final int x, final int y) {
-        return xTiles.get(x).get(y);
+        try {
+            return xTiles.get(x).get(y);
+        } catch (ArrayIndexOutOfBoundsException e) {
+            return null;
+        }
     }
 
     public ArrayList<Tile> getFlattenedTiles() {
@@ -90,5 +95,13 @@ public class TilesMap {
         }
 
 
+    }
+
+    public void resetAllTileChecks() {
+        for (int i = 0; i < xTiles.size(); i++) {
+            for (int j = 0; j < xTiles.get(i).size(); j++) {
+                xTiles.get(i).get(j).setHasBeenChecked(false);
+            }
+        }
     }
 }

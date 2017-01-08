@@ -280,10 +280,16 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
     public boolean keyDown(final int keycode) {
 
         // Generate new sprite
-//        if (keycode == Input.Keys.ENTER) {
+        if (keycode == Input.Keys.ENTER) {
 //            System.out.println("Generating new sprite");
 //            spriteMovementHandler.addSpriteToList(SpriteGenerator.generatePerson(game, this, TILE_SIZE, tilesMap, "basic_person", 385, 500));
-//        }
+
+            System.out.println(SpriteShortestPathFinder.getShortestPath(tilesMap,
+                    spriteStateHandler.getPatrollingPersons().get(0).currentTileX / TILE_SIZE,
+                    spriteStateHandler.getPatrollingPersons().get(0).currentTileY / TILE_SIZE,
+                    27,
+                    12));
+        }
 
         if(keycode == Input.Keys.LEFT)
             camera.translate(-32,0);
