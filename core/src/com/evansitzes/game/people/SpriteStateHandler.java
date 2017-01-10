@@ -3,6 +3,7 @@ package com.evansitzes.game.people;
 import com.evansitzes.game.CityBuildingGame;
 import com.evansitzes.game.GameScreen;
 import com.evansitzes.game.buildings.Building;
+import com.evansitzes.game.people.sprites.PatrolPerson;
 import com.evansitzes.game.people.sprites.Person;
 
 import java.util.ArrayList;
@@ -16,19 +17,21 @@ public class SpriteStateHandler {
     private CityBuildingGame game;
     private ArrayList<Building> buildings;
     private GameScreen gameScreen;
-    private ArrayList<Person> patrollingPersons;
+    private ArrayList<PatrolPerson> patrollingPersons;
     private ArrayList<Person> returningHomePersons;
 
     public SpriteStateHandler(final CityBuildingGame game, final ArrayList<Building> buildings, final GameScreen gameScreen) {
         this.game = game;
         this.buildings = buildings;
         this.gameScreen = gameScreen;
-        patrollingPersons = new ArrayList<Person>();
+        patrollingPersons = new ArrayList<PatrolPerson>();
         returningHomePersons = new ArrayList<Person>();
 
     }
 
-    public void handleSpritesStates() {
+    public void handleSpritesStates(final float delta) {
+
+        //TODO no need to check this 3 times a second
         for (final Building building : buildings) {
             if (building.name.equals("guard_house") && building.spritesGenerated < 1) {
                 building.spritesGenerated++;
@@ -37,20 +40,38 @@ public class SpriteStateHandler {
         }
 
         // Check sprites going home
-        final Iterator<Person> iterator = returningHomePersons.iterator();
-        while (iterator.hasNext()) {
-            final Person person = iterator.next();
+        final Iterator<Person> returningIterator = returningHomePersons.iterator();
+        while (returningIterator.hasNext()) {
+            final Person person = returningIterator.next();
 
             if (person.pathHome.isEmpty()) {
-                iterator.remove();
+                returningIterator.remove();
             }
 
         }
 
+        // Update time for all sprites in field
+        for (final PatrolPerson person : patrollingPersons) {
+            person.updateTimeInField(delta);
+        }
+
+        // Check sprites patrolling
+        final Iterator<PatrolPerson> patrollingIterator = patrollingPersons.iterator();
+
+        while (patrollingIterator.hasNext()) {
+            final PatrolPerson person = patrollingIterator.next();
+
+            if (person.timeInFieldExpired) {
+                returningHomePersons.add(person);
+                patrollingIterator.remove();
+                gameScreen.sendSpriteHome(person);
+            }
+
+        }
     }
 
     public void addSpriteToList(final Person person) {
-        patrollingPersons.add(person);
+        patrollingPersons.add((PatrolPerson) person);
     }
 
     public void addSpriteToReturningHomeList(final Person person) {
@@ -58,20 +79,7 @@ public class SpriteStateHandler {
         patrollingPersons.remove(person);
     }
 
-    public ArrayList<Person> getPatrollingPersons() {
-        final Iterator<Person> iterator = patrollingPersons.iterator();
-
-        while (iterator.hasNext()) {
-            final Person person = iterator.next();
-
-//            if (person.hasTimeInFieldExpired()) {
-//                person.setTimeInFieldHasExpired();
-//                returningHomePersons.add(person);
-//                iterator.remove();
-//            }
-
-        }
-
+    public ArrayList<PatrolPerson> getPatrollingPersons() {
         return patrollingPersons;
     }
 

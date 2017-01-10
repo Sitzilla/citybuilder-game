@@ -113,14 +113,14 @@ public class Person extends Entity {
             state = IDLE;
         }
     }
-
-    //TODO maybe make these abstract?
-    public boolean hasTimeInFieldExpired() {
-        return false;
-    }
-
-    public void setTimeInFieldHasExpired() {
-    }
+//
+//    //TODO maybe make these abstract?
+//    public boolean hasTimeInFieldExpired() {
+//        return false;
+//    }
+//
+//    public void setTimeInFieldHasExpired() {
+//    }
 
     private void handleInput(final float delta) {
 

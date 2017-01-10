@@ -75,14 +75,14 @@ public class SpriteHelper {
                 case DOWN: adjacentRoadTiles.add(tilesMap.getTile((xPixels + (direction.directionIndex * TILE_SIZE)) / TILE_SIZE, (yPixels - TILE_SIZE) / TILE_SIZE));
                             break;
 
-                case UP: adjacentRoadTiles.add(tilesMap.getTile((xPixels + (direction.directionIndex * TILE_SIZE)) / TILE_SIZE, (yPixels + TILE_SIZE) / TILE_SIZE));
-                    break;
+                case UP: adjacentRoadTiles.add(tilesMap.getTile((xPixels + (direction.directionIndex * TILE_SIZE)) / TILE_SIZE, (yPixels + (TILE_SIZE * buildingSize)) / TILE_SIZE));
+                            break;
 
                 case LEFT: adjacentRoadTiles.add(tilesMap.getTile((xPixels - TILE_SIZE) / TILE_SIZE, (yPixels + (direction.directionIndex * TILE_SIZE)) / TILE_SIZE));
-                    break;
+                            break;
 
-                case RIGHT: adjacentRoadTiles.add(tilesMap.getTile((xPixels + TILE_SIZE) / TILE_SIZE, (yPixels + (direction.directionIndex * TILE_SIZE)) / TILE_SIZE));
-                    break;
+                case RIGHT: adjacentRoadTiles.add(tilesMap.getTile((xPixels + (TILE_SIZE * buildingSize)) / TILE_SIZE, (yPixels + (direction.directionIndex * TILE_SIZE)) / TILE_SIZE));
+                            break;
             }
 
         }

@@ -64,10 +64,6 @@ structures:
   y: 384
   sprite_name: "house"
   tile_size: 2
-- x: 800
-  y: 416
-  sprite_name: "guard_house"
-  tile_size: 2
 - x: 736
   y: 224
   sprite_name: "road"
@@ -256,3 +252,19 @@ structures:
   y: 288
   sprite_name: "road"
   tile_size: 1
+- x: 736
+  y: 288
+  sprite_name: "road"
+  tile_size: 1
+- x: 864
+  y: 352
+  sprite_name: "road"
+  tile_size: 1
+- x: 864
+  y: 384
+  sprite_name: "road"
+  tile_size: 1
+- x: 448
+  y: 96
+  sprite_name: "guard_house"
+  tile_size: 2

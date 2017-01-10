@@ -267,7 +267,7 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
         }
 
         // Handle Sprites
-        spriteStateHandler.handleSpritesStates();
+        spriteStateHandler.handleSpritesStates(delta);
         spriteMovementHandler.handlePatrollingSprites(delta, spriteStateHandler.getPatrollingPersons());
         spriteMovementHandler.handleReturningHomeSprites(delta, spriteStateHandler.getReturningHomePersons());
 

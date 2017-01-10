@@ -16,7 +16,7 @@ public class SpriteGenerator {
 
     public static Person generatePerson(final CityBuildingGame game, final GameScreen screen, final Building homeBuilding, final int TILE_SIZE, final TilesMap tilesMap, final String name, final int x, final int y) {
         // TODO hardcoded field info
-        final Person person = new PatrolPerson(game, screen, name, homeBuilding, 300000, x, y);
+        final Person person = new PatrolPerson(game, screen, name, homeBuilding, 5, x, y);
         person.state = Person.State.IDLE;
         person.direction = DOWN;
 

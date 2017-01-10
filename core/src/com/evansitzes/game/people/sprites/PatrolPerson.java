@@ -10,31 +10,28 @@ import org.joda.time.DateTime;
  */
 public class PatrolPerson extends Person {
 
-    public long millisecondsInTheField;
     public DateTime timeCreated;
     public boolean timeInFieldExpired;
 
-    public PatrolPerson(final CityBuildingGame game, final GameScreen screen, final String name, final Building homeBuilding, final long millisecondsInTheField, final int x, final int y) {
+    // All sprite time in seconds
+    public float maxTimeInField;
+    public float currentTimeInField;
+
+    public PatrolPerson(final CityBuildingGame game, final GameScreen screen, final String name, final Building homeBuilding, final float maxTimeInField, final int x, final int y) {
         super(game, screen, name, homeBuilding, x, y);
 
-        this.millisecondsInTheField = millisecondsInTheField;
+        this.maxTimeInField = maxTimeInField;
         timeCreated = new DateTime();
         timeInFieldExpired = false;
     }
 
-    //TODO this doesnt account for game pausing
-    @Override
-    public boolean hasTimeInFieldExpired() {
-        if (timeInFieldExpired == true) {
-            return timeInFieldExpired;
+    public void updateTimeInField(final float delta) {
+        currentTimeInField += delta;
+
+        if (currentTimeInField > maxTimeInField) {
+            timeInFieldExpired = true;
         }
-
-        return new DateTime().getMillis() > timeCreated.getMillis() + millisecondsInTheField;
     }
 
-    @Override
-    public void setTimeInFieldHasExpired() {
-        timeInFieldExpired = true;
-    }
 
 }

@@ -21,6 +21,11 @@ public class SpriteShortestPathFinder {
         for (final EnhancedTile road : adjacentRoads) {
             final Stack<Facing> newPath = getShortestPathToTile(tilesMap, currentX, currentY, road.getX(), road.getY());
 
+            // TODO do something about this null check. Should the sprite just die?
+            if (newPath == null) {
+                continue;
+            }
+
             // TODO what about when the sprite is already there?
             if (newPath.size() < shortestPath.size() || shortestPath.isEmpty()) {
                 shortestPath = newPath;
@@ -41,6 +46,7 @@ public class SpriteShortestPathFinder {
             // No path
             if (tilesToCheck.isEmpty()) {
                 //TODO no path to building or it is too far away. throw error/handle sprite
+                System.out.println("No path home!");
                 return null;
             }
 

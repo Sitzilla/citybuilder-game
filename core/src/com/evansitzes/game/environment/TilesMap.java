@@ -50,7 +50,7 @@ public class TilesMap {
     public EnhancedTile getTile(final int x, final int y) {
         try {
             return xTiles.get(x).get(y);
-        } catch (ArrayIndexOutOfBoundsException e) {
+        } catch (final IndexOutOfBoundsException e) {
             return null;
         }
     }

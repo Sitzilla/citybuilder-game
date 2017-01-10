@@ -2,6 +2,7 @@ package com.evansitzes.game.people;
 
 import com.evansitzes.game.CityBuildingGame;
 import com.evansitzes.game.environment.TilesMap;
+import com.evansitzes.game.people.sprites.PatrolPerson;
 import com.evansitzes.game.people.sprites.Person;
 import com.evansitzes.game.people.sprites.Person.Facing;
 import com.evansitzes.game.people.sprites.Person.State;
@@ -28,7 +29,7 @@ public class SpriteMovementHandler {
         this.tilesMap = tilesMap;
     }
 
-    public void handlePatrollingSprites(final float delta, final ArrayList<Person> persons) {
+    public void handlePatrollingSprites(final float delta, final ArrayList<PatrolPerson> persons) {
         for (final Person person : persons) {
             handlePatrollingSprite(person, delta);
         }
