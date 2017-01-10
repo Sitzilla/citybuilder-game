@@ -2,17 +2,21 @@ package com.evansitzes.game.people;
 
 import com.evansitzes.game.CityBuildingGame;
 import com.evansitzes.game.GameScreen;
+import com.evansitzes.game.buildings.Building;
 import com.evansitzes.game.environment.TilesMap;
+import com.evansitzes.game.people.sprites.PatrolPerson;
+import com.evansitzes.game.people.sprites.Person;
 
-import static com.evansitzes.game.people.Person.Facing.DOWN;
+import static com.evansitzes.game.people.sprites.Person.Facing.DOWN;
 
 /**
  * Created by evan on 12/30/16.
  */
 public class SpriteGenerator {
 
-    public static Person generatePerson(final CityBuildingGame game, final GameScreen screen, final int TILE_SIZE, final TilesMap tilesMap, final String name, final int x, final int y) {
-        final Person person = new Person(game, screen, name, x, y);
+    public static Person generatePerson(final CityBuildingGame game, final GameScreen screen, final Building homeBuilding, final int TILE_SIZE, final TilesMap tilesMap, final String name, final int x, final int y) {
+        // TODO hardcoded field info
+        final Person person = new PatrolPerson(game, screen, name, homeBuilding, 5, x, y);
         person.state = Person.State.IDLE;
         person.direction = DOWN;
 

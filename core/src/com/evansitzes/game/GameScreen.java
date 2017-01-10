@@ -18,14 +18,17 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.evansitzes.game.buildings.Building;
+import com.evansitzes.game.environment.EnhancedTile;
 import com.evansitzes.game.environment.Level;
 import com.evansitzes.game.environment.TilesMap;
 import com.evansitzes.game.helpers.Direction;
 import com.evansitzes.game.helpers.TextHelper;
 import com.evansitzes.game.people.*;
+import com.evansitzes.game.people.sprites.Person;
 import com.evansitzes.game.state.StateHelper;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import static com.evansitzes.game.people.SpriteHelper.getNextXCornerTileFromDirection;
 import static com.evansitzes.game.people.SpriteHelper.getNextYCornerTileFromDirection;
@@ -263,8 +266,10 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
             building.draw();
         }
 
-        spriteStateHandler.handleSpritesStates();
-        spriteMovementHandler.handleAllSprites(delta);
+        // Handle Sprites
+        spriteStateHandler.handleSpritesStates(delta);
+        spriteMovementHandler.handlePatrollingSprites(delta, spriteStateHandler.getPatrollingPersons());
+        spriteMovementHandler.handleReturningHomeSprites(delta, spriteStateHandler.getReturningHomePersons());
 
         game.batch.end();
 
@@ -279,8 +284,10 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
 
         // Generate new sprite
         if (keycode == Input.Keys.ENTER) {
-            System.out.println("Generating new sprite");
-            spriteMovementHandler.addSpriteToList(SpriteGenerator.generatePerson(game, this, TILE_SIZE, tilesMap, "basic_person", 385, 500));
+//            System.out.println("Generating new sprite");
+//            spriteMovementHandler.addSpriteToList(SpriteGenerator.generatePerson(game, this, TILE_SIZE, tilesMap, "basic_person", 385, 500));
+            spriteStateHandler.addSpriteToReturningHomeList(spriteStateHandler.getPatrollingPersons().get(0));
+            sendSpriteHome(spriteStateHandler.getReturningHomePersons().get(0));
         }
 
         if(keycode == Input.Keys.LEFT)
@@ -317,7 +324,7 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
                 if (isClickedSquareOccupied()) {
                     System.out.println("Show Dialog");
 
-                    BasicInformationPopup popup = new BasicInformationPopup("Building Info", skin);
+                    final BasicInformationPopup popup = new BasicInformationPopup("Building Info", skin);
                     stage.addActor(popup);
                 }
             }
@@ -410,10 +417,10 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
 
     }
 
-    public void createNewSprite(final String name, final int x, final int y, final int buildingSize) {
+    public void createNewSprite(final String name, final int x, final int y, final Building building) {
         System.out.println("Generating new sprite");
 
-        Direction direction = SpriteHelper.getRandomValidDirection(x, y, buildingSize, null, TILE_SIZE, tilesMap);
+        final Direction direction = SpriteHelper.getRandomValidDirection(x, y, building.tileSize, null, TILE_SIZE, tilesMap);
 
         System.out.println(direction);
         if (direction == null || direction.facingDirection == null) {
@@ -423,17 +430,34 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
 
         final Person newPerson = SpriteGenerator.generatePerson(game,
                 this,
+                building,
                 TILE_SIZE,
                 tilesMap,
                 name,
-                getNextXCornerTileFromDirection(x, TILE_SIZE, buildingSize, direction.directionIndex, direction.facingDirection),
-                getNextYCornerTileFromDirection(y, TILE_SIZE, buildingSize, direction.directionIndex, direction.facingDirection));
+                getNextXCornerTileFromDirection(x, TILE_SIZE, building.tileSize, direction.directionIndex, direction.facingDirection),
+                getNextYCornerTileFromDirection(y, TILE_SIZE, building.tileSize, direction.directionIndex, direction.facingDirection));
 
         if (newPerson == null) {
             return;
         }
 
-        spriteMovementHandler.addSpriteToList(newPerson);
+        spriteStateHandler.addSpriteToList(newPerson);
+    }
+
+    public void sendSpriteHome(final Person patrolPerson) {
+        final Building homeBuilding = patrolPerson.homeBuilding;
+        final List<EnhancedTile> adjacentRoads = SpriteHelper.getBuildingsAdjacentRoads(homeBuilding.x, homeBuilding.y, homeBuilding.tileSize, TILE_SIZE, tilesMap);
+
+        //TODO check for null/empty stack
+        patrolPerson.pathHome = SpriteShortestPathFinder.getShortestPathToBuilding(tilesMap, patrolPerson.currentTileX / TILE_SIZE, patrolPerson.currentTileY / TILE_SIZE, adjacentRoads);
+//        try {
+//            patrolPerson.direction = patrolPerson.pathHome.pop();
+////            patrolPerson.nextDirection.facingDirection = patrolPerson.pathHome.pop();
+//            patrolPerson.nextDirection.facingDirection = patrolPerson.direction;
+            patrolPerson.justBeganReturningHome = true;
+//        } catch (EmptyStackException e) {
+//            spriteStateHandler.getPatrollingPersons().remove(patrolPerson);
+//        }
     }
 
     private Vector3 getMousePositionInGameWorld() {

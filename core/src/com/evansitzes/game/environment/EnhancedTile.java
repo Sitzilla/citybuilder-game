@@ -8,6 +8,7 @@ import com.evansitzes.game.state.Tile;
  */
 public class EnhancedTile extends Tile {
     private Building building;
+    private boolean hasBeenChecked;
 
     public EnhancedTile(final Tile tile) {
         this.setX(tile.getX());
@@ -25,5 +26,13 @@ public class EnhancedTile extends Tile {
 
     public void setBuilding(final Building building) {
         this.building = building;
+    }
+
+    public boolean isHasBeenChecked() {
+        return hasBeenChecked;
+    }
+
+    public void setHasBeenChecked(boolean hasBeenChecked) {
+        this.hasBeenChecked = hasBeenChecked;
     }
 }
