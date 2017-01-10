@@ -18,6 +18,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.evansitzes.game.buildings.Building;
+import com.evansitzes.game.environment.EnhancedTile;
 import com.evansitzes.game.environment.Level;
 import com.evansitzes.game.environment.TilesMap;
 import com.evansitzes.game.helpers.Direction;
@@ -27,6 +28,7 @@ import com.evansitzes.game.people.sprites.Person;
 import com.evansitzes.game.state.StateHelper;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import static com.evansitzes.game.people.SpriteHelper.getNextXCornerTileFromDirection;
 import static com.evansitzes.game.people.SpriteHelper.getNextYCornerTileFromDirection;
@@ -264,6 +266,7 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
             building.draw();
         }
 
+        // Handle Sprites
         spriteStateHandler.handleSpritesStates();
         spriteMovementHandler.handlePatrollingSprites(delta, spriteStateHandler.getPatrollingPersons());
         spriteMovementHandler.handleReturningHomeSprites(delta, spriteStateHandler.getReturningHomePersons());
@@ -283,12 +286,8 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
         if (keycode == Input.Keys.ENTER) {
 //            System.out.println("Generating new sprite");
 //            spriteMovementHandler.addSpriteToList(SpriteGenerator.generatePerson(game, this, TILE_SIZE, tilesMap, "basic_person", 385, 500));
-
-            System.out.println(SpriteShortestPathFinder.getShortestPath(tilesMap,
-                    spriteStateHandler.getPatrollingPersons().get(0).currentTileX / TILE_SIZE,
-                    spriteStateHandler.getPatrollingPersons().get(0).currentTileY / TILE_SIZE,
-                    27,
-                    12));
+            spriteStateHandler.addSpriteToReturningHomeList(spriteStateHandler.getPatrollingPersons().get(0));
+            sendSpriteHome(spriteStateHandler.getReturningHomePersons().get(0));
         }
 
         if(keycode == Input.Keys.LEFT)
@@ -443,6 +442,22 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
         }
 
         spriteStateHandler.addSpriteToList(newPerson);
+    }
+
+    public void sendSpriteHome(final Person patrolPerson) {
+        final Building homeBuilding = patrolPerson.homeBuilding;
+        final List<EnhancedTile> adjacentRoads = SpriteHelper.getBuildingsAdjacentRoads(homeBuilding.x, homeBuilding.y, homeBuilding.tileSize, TILE_SIZE, tilesMap);
+
+        //TODO check for null/empty stack
+        patrolPerson.pathHome = SpriteShortestPathFinder.getShortestPathToBuilding(tilesMap, patrolPerson.currentTileX / TILE_SIZE, patrolPerson.currentTileY / TILE_SIZE, adjacentRoads);
+//        try {
+//            patrolPerson.direction = patrolPerson.pathHome.pop();
+////            patrolPerson.nextDirection.facingDirection = patrolPerson.pathHome.pop();
+//            patrolPerson.nextDirection.facingDirection = patrolPerson.direction;
+            patrolPerson.justBeganReturningHome = true;
+//        } catch (EmptyStackException e) {
+//            spriteStateHandler.getPatrollingPersons().remove(patrolPerson);
+//        }
     }
 
     private Vector3 getMousePositionInGameWorld() {

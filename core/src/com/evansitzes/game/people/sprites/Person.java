@@ -7,6 +7,8 @@ import com.evansitzes.game.Textures;
 import com.evansitzes.game.buildings.Building;
 import com.evansitzes.game.helpers.Direction;
 
+import java.util.Stack;
+
 import static com.evansitzes.game.people.sprites.Person.Facing.DOWN;
 import static com.evansitzes.game.people.sprites.Person.Facing.RIGHT;
 import static com.evansitzes.game.people.sprites.Person.State.IDLE;
@@ -33,6 +35,9 @@ public class Person extends Entity {
     public Direction nextDirection;
     public int currentTileX;
     public int currentTileY;
+
+    public Stack<Facing> pathHome;
+    public boolean justBeganReturningHome;
 
     public enum State {
         IDLE, WALKING

@@ -35,10 +35,27 @@ public class SpriteStateHandler {
                 gameScreen.createNewSprite("guard", building.x, building.y, building);
             }
         }
+
+        // Check sprites going home
+        final Iterator<Person> iterator = returningHomePersons.iterator();
+        while (iterator.hasNext()) {
+            final Person person = iterator.next();
+
+            if (person.pathHome.isEmpty()) {
+                iterator.remove();
+            }
+
+        }
+
     }
 
     public void addSpriteToList(final Person person) {
         patrollingPersons.add(person);
+    }
+
+    public void addSpriteToReturningHomeList(final Person person) {
+        returningHomePersons.add(person);
+        patrollingPersons.remove(person);
     }
 
     public ArrayList<Person> getPatrollingPersons() {
@@ -47,11 +64,11 @@ public class SpriteStateHandler {
         while (iterator.hasNext()) {
             final Person person = iterator.next();
 
-            if (person.hasTimeInFieldExpired()) {
-                person.setTimeInFieldHasExpired();
-                returningHomePersons.add(person);
-                iterator.remove();
-            }
+//            if (person.hasTimeInFieldExpired()) {
+//                person.setTimeInFieldHasExpired();
+//                returningHomePersons.add(person);
+//                iterator.remove();
+//            }
 
         }
 

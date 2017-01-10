@@ -5,10 +5,7 @@ import com.evansitzes.game.environment.TilesMap;
 import com.evansitzes.game.helpers.DirectionTile;
 import com.evansitzes.game.people.sprites.Person.Facing;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.Queue;
-import java.util.Stack;
+import java.util.*;
 
 /**
 - Finds the shortest path between two points on the map using a breadth first search.
@@ -18,8 +15,23 @@ import java.util.Stack;
  */
 public class SpriteShortestPathFinder {
 
-    public static final Stack<Facing> getShortestPath(final TilesMap tilesMap, final int currentX, final int currentY, final int targetX, final int targetY) {
-        final ArrayList<DirectionTile> checkedTiles = new ArrayList<DirectionTile>();
+    public static final Stack<Facing> getShortestPathToBuilding(final TilesMap tilesMap, final int currentX, final int currentY, final List<EnhancedTile> adjacentRoads) {
+        Stack<Facing> shortestPath = new Stack<Facing>();
+
+        for (final EnhancedTile road : adjacentRoads) {
+            final Stack<Facing> newPath = getShortestPathToTile(tilesMap, currentX, currentY, road.getX(), road.getY());
+
+            // TODO what about when the sprite is already there?
+            if (newPath.size() < shortestPath.size() || shortestPath.isEmpty()) {
+                shortestPath = newPath;
+            }
+        }
+
+        return shortestPath;
+    }
+
+    public static final Stack<Facing> getShortestPathToTile(final TilesMap tilesMap, final int currentX, final int currentY, final int targetX, final int targetY) {
+        final List<DirectionTile> checkedTiles = new ArrayList<DirectionTile>();
         final Queue<DirectionTile> tilesToCheck = new LinkedList<DirectionTile>();
         tilesToCheck.add(new DirectionTile(null, null, currentX, currentY));
         final DirectionTile targetTile;

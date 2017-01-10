@@ -1,11 +1,13 @@
 package com.evansitzes.game.people;
 
 import com.evansitzes.game.buildings.Building;
+import com.evansitzes.game.environment.EnhancedTile;
 import com.evansitzes.game.environment.TilesMap;
 import com.evansitzes.game.helpers.Direction;
 import com.evansitzes.game.people.sprites.Person.Facing;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 import static com.evansitzes.game.people.sprites.Person.Facing.*;
@@ -62,6 +64,30 @@ public class SpriteHelper {
 
         //TODO should throw an error here
         return 0;
+    }
+
+    public static List<EnhancedTile> getBuildingsAdjacentRoads(final int xPixels, final int yPixels, final int buildingSize, final int TILE_SIZE, final TilesMap tilesMap) {
+        final List<Direction> adjacentRoadDirections = getAllAvailableRoads(xPixels, yPixels, buildingSize, null, TILE_SIZE, tilesMap);
+        final List<EnhancedTile> adjacentRoadTiles = new ArrayList<EnhancedTile>();
+
+        for (final Direction direction : adjacentRoadDirections) {
+            switch (direction.facingDirection) {
+                case DOWN: adjacentRoadTiles.add(tilesMap.getTile((xPixels + (direction.directionIndex * TILE_SIZE)) / TILE_SIZE, (yPixels - TILE_SIZE) / TILE_SIZE));
+                            break;
+
+                case UP: adjacentRoadTiles.add(tilesMap.getTile((xPixels + (direction.directionIndex * TILE_SIZE)) / TILE_SIZE, (yPixels + TILE_SIZE) / TILE_SIZE));
+                    break;
+
+                case LEFT: adjacentRoadTiles.add(tilesMap.getTile((xPixels - TILE_SIZE) / TILE_SIZE, (yPixels + (direction.directionIndex * TILE_SIZE)) / TILE_SIZE));
+                    break;
+
+                case RIGHT: adjacentRoadTiles.add(tilesMap.getTile((xPixels + TILE_SIZE) / TILE_SIZE, (yPixels + (direction.directionIndex * TILE_SIZE)) / TILE_SIZE));
+                    break;
+            }
+
+        }
+
+        return adjacentRoadTiles;
     }
 
     private static ArrayList<Direction> getAllAvailableRoads(final int xPixels, final int yPixels, final int buildingSize, final Facing directionSpriteCameFrom, final int TILE_SIZE, final TilesMap tilesMap) {
