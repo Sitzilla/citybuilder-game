@@ -22,6 +22,7 @@ import com.evansitzes.game.environment.EnhancedTile;
 import com.evansitzes.game.environment.Level;
 import com.evansitzes.game.environment.TilesMap;
 import com.evansitzes.game.helpers.Direction;
+import com.evansitzes.game.helpers.Point;
 import com.evansitzes.game.helpers.TextHelper;
 import com.evansitzes.game.people.*;
 import com.evansitzes.game.people.sprites.Person;
@@ -30,6 +31,7 @@ import com.evansitzes.game.state.StateHelper;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.evansitzes.game.helpers.PointHelper.getCornerTileFromMiddleArea;
 import static com.evansitzes.game.people.SpriteHelper.getNextXCornerTileFromDirection;
 import static com.evansitzes.game.people.SpriteHelper.getNextYCornerTileFromDirection;
 
@@ -72,8 +74,8 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
     private int currentImageTilesize;
 //    private int currentMouseX;
 //    private int currentMouseY;
-    private int currentTileX;
-    private int currentTileY;
+//    private int currentTileX;
+//    private int currentTileY;
 
     private final ArrayList<Building> buildings;
 //    private final ArrayList<Tile> tilesMap = new ArrayList<Tile>();
@@ -173,14 +175,8 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
             }
         });
 
-//        final Label nameLabel = new Label("Name:", skin);
-//        final TextField nameText = new TextField("", skin);
-//        final Label addressLabel = new Label("Address:", skin);
-//        final TextField addressText = new TextField("", skin);
-
         final Table entireScreenTable = new Table();
         final Table sidebarTable = new Table();
-//        table.setFillParent(true);
         entireScreenTable.setBackground(sidebarDrawable);
 
         sidebarTable.add(houseButton);
@@ -233,19 +229,17 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
 
         game.batch.begin();
 
-//        font.draw(game.batch, "Population:", Gdx.graphics.getWidth() - 400, Gdx.graphics.getHeight() - 10);
-
         if (buildingSelected) {
-            // TODO refactor
-            // - global variable modification
-            setCornerTileFromMiddleArea((int) getMousePositionInGameWorld().x, (int) getMousePositionInGameWorld().y, currentImageTilesize);
-            drawTileBorder(currentTileX, currentTileY, currentImageTilesize);
+            final Point currentTile = getCornerTileFromMiddleArea((int) getMousePositionInGameWorld().x, (int) getMousePositionInGameWorld().y, currentImageTilesize);
 
-            selectedBuildingImage.draw(game.batch,
-                                    currentTileX,
-                                    currentTileY,
-                                    level.tileWidth * currentImageTilesize,
-                                    level.tileHeight * currentImageTilesize);
+            if (currentTile.x > 0 && currentTile.y > 0) {
+                drawTileBorder(currentTile.x, currentTile.y, currentImageTilesize);
+                selectedBuildingImage.draw(game.batch,
+                        currentTile.x,
+                        currentTile.y,
+                        level.tileWidth * currentImageTilesize,
+                        level.tileHeight * currentImageTilesize);
+            }
         }
 
         if (bulldozingEnabled) {
@@ -253,7 +247,7 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
 //            Gdx.graphics.setCursor(Gdx.graphics.newCursor(bulldozingPixmap, 0, 0));
             // TODO refactor
             // - global variable modification
-//            setCornerTileFromMiddleArea(currentMouseX, currentMouseY, 1);
+//            getCornerTileFromMiddleArea(currentMouseX, currentMouseY, 1);
 //            bulldozingImage.draw(game.batch,
 //                    currentTileX,
 //                    currentTileY,
@@ -320,11 +314,12 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
 
             // Show information popup
             if (!buildingSelected && !bulldozingEnabled) {
-                setCornerTileFromMiddleArea((int) getMousePositionInGameWorld().x, (int) getMousePositionInGameWorld().y, 1);
-                if (isClickedSquareOccupied()) {
+                Point currentTile = getCornerTileFromMiddleArea((int) getMousePositionInGameWorld().x, (int) getMousePositionInGameWorld().y, 1);
+                if (isClickedSquareOccupied(currentTile)) {
                     System.out.println("Show Dialog");
 
-                    final BasicInformationPopup popup = new BasicInformationPopup("Building Info", skin);
+
+                    final BasicInformationPopup popup = new BasicInformationPopup("Building Info",  skin);
                     stage.addActor(popup);
                 }
             }
@@ -338,36 +333,33 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
             System.out.println(screenX);
             System.out.println(Gdx.graphics.getHeight() - screenY);
 
-            if (currentTileX < 0 || currentTileY < 0) {
-                return false;
-            }
-
-            if (buildingSelected && !isPlacementAreaOccupied()) {
+            Point currentTile = getCornerTileFromMiddleArea((int) getMousePositionInGameWorld().x, (int) getMousePositionInGameWorld().y, currentImageTilesize);
+            if (buildingSelected && !isPlacementAreaOccupied(currentTile)) {
                 final Building building = new Building(game, currentImageTilesize, currentBuildingName);
-                building.x = currentTileX;
-                building.y = currentTileY;
+                building.x = currentTile.x;
+                building.y = currentTile.y;
 
                 buildings.add(building);
 //                spriteStateHandler.refreshBuildings
-                setTileBuilding(building);
+                setTileBuilding(building, currentTile);
 //                spriteMovementHandler.setBuildings(buildings);
-                setAreDevelopedTiles(true);
+                setAreDevelopedTiles(true, currentTile);
             }
 
-            setCornerTileFromMiddleArea((int) getMousePositionInGameWorld().x, (int) getMousePositionInGameWorld().y, 1);
+            currentTile = getCornerTileFromMiddleArea((int) getMousePositionInGameWorld().x, (int) getMousePositionInGameWorld().y, 1);
 
-            if (bulldozingEnabled && isClickedSquareOccupied()) {
+            if (bulldozingEnabled && isClickedSquareOccupied(currentTile)) {
 
                 for (final Building building : buildings) {
-                    if (building.overhangs(currentTileX, currentTileY)) {
+                    if (building.overhangs(currentTile.x, currentTile.y)) {
                         buildings.remove(building);
 //                        spriteMovementHandler.setBuildings(buildings);
                         //TODO tile size
-                        currentTileX = building.x;
-                        currentTileY = building.y;
+                        currentTile.x = building.x;
+                        currentTile.y = building.y;
                         currentImageTilesize = building.tileSize;
-                        setTileBuilding(null);
-                        setAreDevelopedTiles(false);
+                        setTileBuilding(null, currentTile);
+                        setAreDevelopedTiles(false, currentTile);
                         break;
                     }
                 }
@@ -390,12 +382,7 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
 
     @Override
     public boolean mouseMoved(final int screenX, final int screenY) {
-
-        //TODO magic numbers
-        // Not currently used... can use later when wanting to tie an image to the mouse
-//            buildingX = screenX - 25 * currentImageTilesize;
-//            buildingY = Gdx.graphics.getHeight() - screenY - 25 * currentImageTilesize;
-
+//         Not currently used... can use later when wanting to tie an image to the mouse
 //            currentMouseX = screenX;
 //            currentMouseY = Gdx.graphics.getHeight() - screenY;
 
@@ -450,118 +437,43 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
 
         //TODO check for null/empty stack
         patrolPerson.pathHome = SpriteShortestPathFinder.getShortestPathToBuilding(tilesMap, patrolPerson.currentTileX / TILE_SIZE, patrolPerson.currentTileY / TILE_SIZE, adjacentRoads);
-//        try {
-//            patrolPerson.direction = patrolPerson.pathHome.pop();
-////            patrolPerson.nextDirection.facingDirection = patrolPerson.pathHome.pop();
-//            patrolPerson.nextDirection.facingDirection = patrolPerson.direction;
-            patrolPerson.justBeganReturningHome = true;
-//        } catch (EmptyStackException e) {
-//            spriteStateHandler.getPatrollingPersons().remove(patrolPerson);
-//        }
+        patrolPerson.justBeganReturningHome = true;
     }
 
     private Vector3 getMousePositionInGameWorld() {
         return camera.unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
     }
 
-    private void setAreDevelopedTiles(final boolean isOccupied) {
+    private void setAreDevelopedTiles(final boolean isOccupied, final Point currentTile) {
         for (int i = 0; i < currentImageTilesize; i++) {
             for (int j = 0; j < currentImageTilesize; j++) {
-                tilesMap.getTile(currentTileX / TILE_SIZE + i, currentTileY / TILE_SIZE + j).setOccupied(isOccupied);
+                tilesMap.getTile(currentTile.x / TILE_SIZE + i, currentTile.y / TILE_SIZE + j).setOccupied(isOccupied);
             }
         }
     }
 
-    private void setTileBuilding(final Building building) {
+    private void setTileBuilding(final Building building, final Point currentTile) {
         for (int i = 0; i < currentImageTilesize; i++) {
             for (int j = 0; j < currentImageTilesize; j++) {
-                tilesMap.getTile(currentTileX / TILE_SIZE + i, currentTileY / TILE_SIZE + j).setBuilding(building);
+                tilesMap.getTile(currentTile.x / TILE_SIZE + i, currentTile.y / TILE_SIZE + j).setBuilding(building);
             }
         }
     }
 
-    private boolean isClickedSquareOccupied() {
-        return tilesMap.getTile(currentTileX / TILE_SIZE, currentTileY / TILE_SIZE).isOccupied();
+    private boolean isClickedSquareOccupied(final Point currentTile) {
+        return tilesMap.getTile(currentTile.x / TILE_SIZE, currentTile.y / TILE_SIZE).isOccupied();
     }
 
-    private boolean isPlacementAreaOccupied() {
+    private boolean isPlacementAreaOccupied(final Point currentTile) {
         for (int i = 0; i < currentImageTilesize; i++) {
             for (int j = 0; j < currentImageTilesize; j++) {
-                if (tilesMap.getTile(currentTileX / TILE_SIZE + i, currentTileY / TILE_SIZE + j).isOccupied()) {
+                if (tilesMap.getTile(currentTile.x / TILE_SIZE + i, currentTile.y / TILE_SIZE + j).isOccupied()) {
                     return true;
                 }
             }
         }
 
         return false;
-    }
-
-    private void setCornerTileFromMiddleArea(final int screenX, final int screenY, final int numberOfTiles) {
-
-        // tile group has a definite tile as the center
-        if (numberOfTiles % 2 != 0) {
-            currentTileX = screenX / TILE_SIZE * TILE_SIZE - TILE_SIZE * (numberOfTiles / 2);
-            currentTileY = screenY / TILE_SIZE * TILE_SIZE - TILE_SIZE * (numberOfTiles / 2);
-            return;
-        }
-
-        final int midPointX = getClosestCorner(screenX);
-        final int midPointY = getClosestCorner(screenY);
-
-        final int lowerBoundX = midPointX - 20;
-        final int upperBoundX = lowerBoundX + 40;
-
-        final int lowerBoundY = midPointY - 20;
-        final int upperBoundY = lowerBoundY + 40;
-
-        // In lower-left quadrant
-        if (screenX < midPointX && screenX > lowerBoundX &&
-                screenY < midPointY && screenY > lowerBoundY) {
-
-            currentTileX = screenX / TILE_SIZE * TILE_SIZE - TILE_SIZE * ((numberOfTiles / 2) - 1);
-            currentTileY = screenY / TILE_SIZE * TILE_SIZE - TILE_SIZE * ((numberOfTiles / 2) - 1);
-            return;
-        }
-
-        // In lower-right quadrant
-        if (screenX > midPointX && screenX < upperBoundX &&
-                screenY < midPointY && screenY > lowerBoundY) {
-
-            currentTileX = screenX / TILE_SIZE * TILE_SIZE - TILE_SIZE * (numberOfTiles / 2);
-            currentTileY = screenY / TILE_SIZE * TILE_SIZE - TILE_SIZE * ((numberOfTiles / 2) - 1);
-            return;
-        }
-
-        // In upper-left quadrant
-        if (screenX < midPointX && screenX > lowerBoundX &&
-                screenY > midPointY && screenY < upperBoundY) {
-            currentTileX = screenX / TILE_SIZE * TILE_SIZE - TILE_SIZE * ((numberOfTiles / 2) - 1);
-            currentTileY = screenY / TILE_SIZE * TILE_SIZE - TILE_SIZE * (numberOfTiles / 2);
-            return;
-        }
-
-        // In upper-right quadrant
-        if (screenX > midPointX && screenX < upperBoundX &&
-                screenY > midPointY && screenY < upperBoundY) {
-            currentTileX = screenX / TILE_SIZE * TILE_SIZE - TILE_SIZE * (numberOfTiles / 2);
-            currentTileY = screenY / TILE_SIZE * TILE_SIZE - TILE_SIZE * (numberOfTiles / 2);
-            return;
-        }
-
-    }
-
-    private static int getClosestCorner(final int point) {
-        final int lowerBound = point / TILE_SIZE * TILE_SIZE;
-        final int upperBound = lowerBound + TILE_SIZE;
-
-        final int lowerDifference = Math.abs(lowerBound - point);
-        final int upperDifference = Math.abs(upperBound - point);
-
-        if (lowerDifference > upperDifference) {
-            return upperBound;
-        }
-
-        return lowerBound;
     }
 
     private void drawTileBorder(final int bottomLeftCornerXInPixels, final int bottomLeftCornerYInPixels, final int numberOfTiles) {
