@@ -12,18 +12,34 @@ public class Building {
 
     public final CityBuildingGame game;
     public String name;
+    public String prettyName;
     public Sprite sprite;
+    public BuildingType buildingType;
     public int tileSize;
     public int spritesGenerated;
     public int x;
     public int y;
 
-    public Building(final CityBuildingGame game, final int tileSize, final String name) {
+    public enum BuildingType {
+        RESIDENTIAL, EMPLOYABLE, OTHER
+    }
+
+    public Building(final CityBuildingGame game, final int tileSize, final String name, final String prettyName) {
         this.game = game;
         sprite = new Sprite(getBuildingSprite(name));
         this.tileSize = tileSize;
         sprite.setSize(32 * tileSize, 32 * tileSize);
         this.name = name;
+        this.prettyName = prettyName;
+
+        //TODO this is implemented terribly
+        if (name.equals("house")) {
+            this.buildingType = BuildingType.RESIDENTIAL;
+        } else if (name.equals("guard_house")) {
+            this.buildingType = BuildingType.EMPLOYABLE;
+        } else {
+            this.buildingType = BuildingType.OTHER;
+        }
     }
 
     public void draw() {
@@ -49,7 +65,7 @@ public class Building {
         return null;
     }
 
-    public boolean overhangs(int cornerX, int cornerY) {
+    public boolean overhangs(final int cornerX, final int cornerY) {
         //TODO magic numbers
         return cornerX >= x
             && cornerX < x + 32 * tileSize

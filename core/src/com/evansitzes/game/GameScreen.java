@@ -71,16 +71,10 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
     private boolean bulldozingEnabled;
     //TODO replace with building object maybe?
     private String currentBuildingName;
+    private String getCurrentBuildingPrettyName;
     private int currentImageTilesize;
-//    private int currentMouseX;
-//    private int currentMouseY;
-//    private int currentTileX;
-//    private int currentTileY;
 
     private final ArrayList<Building> buildings;
-//    private final ArrayList<Tile> tilesMap = new ArrayList<Tile>();
-//    private final TreeSet<Integer> developedXTiles = new TreeSet<Integer>();
-//    private final TreeSet<Integer> developedYTiles = new TreeSet<Integer>();
 
     private final CityBuildingGame game;
     private final GameflowController gameflowController;
@@ -128,6 +122,7 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
             public void clicked(final InputEvent event, final float x, final float y) {
                 currentImageTilesize = 2;
                 currentBuildingName = "house";
+                getCurrentBuildingPrettyName = "Basic House";
                 selectedBuildingImage = new TextureRegionDrawable((Textures.Sidebar.HOUSE));
                 buildingSelected = true;
                 bulldozingEnabled = false;
@@ -139,6 +134,7 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
             public void clicked(final InputEvent event, final float x, final float y) {
                 currentImageTilesize = 2;
                 currentBuildingName = "guard_house";
+                getCurrentBuildingPrettyName = "City Guard Barracks";
                 selectedBuildingImage = new TextureRegionDrawable((Textures.Sidebar.GUARD_HOUSE));
                 buildingSelected = true;
                 bulldozingEnabled = false;
@@ -150,6 +146,7 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
             public void clicked(final InputEvent event, final float x, final float y) {
                 currentImageTilesize = 1;
                 currentBuildingName = "road";
+                getCurrentBuildingPrettyName = "Basic Road";
                 selectedBuildingImage = new TextureRegionDrawable((Textures.Road.VERTICLE_ROAD));
                 buildingSelected = true;
                 bulldozingEnabled = false;
@@ -315,11 +312,19 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
             // Show information popup
             if (!buildingSelected && !bulldozingEnabled) {
                 Point currentTile = getCornerTileFromMiddleArea((int) getMousePositionInGameWorld().x, (int) getMousePositionInGameWorld().y, 1);
+
+                // Out of bounds on the right (on the sidebar)
+                //TODO magic numbers
+                if (currentTile.x / TILE_SIZE > 31 || currentTile.y / TILE_SIZE > 31) {
+                    buildingSelected = false;
+                    bulldozingEnabled = false;
+                    return false;
+                }
+
                 if (isClickedSquareOccupied(currentTile)) {
                     System.out.println("Show Dialog");
 
-
-                    final BasicInformationPopup popup = new BasicInformationPopup("Building Info",  skin);
+                    final BasicInformationPopup popup = new BasicInformationPopup(getClickedTile(currentTile).getBuilding(), skin);
                     stage.addActor(popup);
                 }
             }
@@ -330,12 +335,9 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
         }
 
         if (button == Buttons.LEFT) {
-            System.out.println(screenX);
-            System.out.println(Gdx.graphics.getHeight() - screenY);
-
             Point currentTile = getCornerTileFromMiddleArea((int) getMousePositionInGameWorld().x, (int) getMousePositionInGameWorld().y, currentImageTilesize);
             if (buildingSelected && !isPlacementAreaOccupied(currentTile)) {
-                final Building building = new Building(game, currentImageTilesize, currentBuildingName);
+                final Building building = new Building(game, currentImageTilesize, currentBuildingName, getCurrentBuildingPrettyName);
                 building.x = currentTile.x;
                 building.y = currentTile.y;
 
@@ -458,6 +460,10 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
                 tilesMap.getTile(currentTile.x / TILE_SIZE + i, currentTile.y / TILE_SIZE + j).setBuilding(building);
             }
         }
+    }
+
+    private EnhancedTile getClickedTile(final Point currentTile) {
+        return tilesMap.getTile(currentTile.x / TILE_SIZE, currentTile.y / TILE_SIZE);
     }
 
     private boolean isClickedSquareOccupied(final Point currentTile) {

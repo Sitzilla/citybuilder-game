@@ -3,16 +3,17 @@ package com.evansitzes.game;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.evansitzes.game.buildings.Building;
 
 /**
  * Created by evan on 12/29/16.
  */
 public class BasicInformationPopup extends Dialog {
 
-    public BasicInformationPopup(final String title, final Skin skin) {
-        super(title, skin);
+    public BasicInformationPopup(final Building building, final Skin skin) {
+        super(building.prettyName, skin);
 
-        this.setName(title);
+        this.setName(building.prettyName);
         this.setSkin(skin);
         this.setPosition(400, 400);
         this.setWidth(500);
@@ -22,13 +23,26 @@ public class BasicInformationPopup extends Dialog {
         setResizable(false);
         this.setDebug(true);
 
-        this.text("A modest home");
+        this.text(building.prettyName);
         this.getContentTable().row();
-        this.text("People living here: 0 / 8");
+
+        String buildingDescription = "";
+        switch (building.buildingType) {
+            case RESIDENTIAL: buildingDescription = "A basic house. People living here have the bare minimum needs.";
+                                break;
+
+            case EMPLOYABLE: buildingDescription = "The guards here are patrolling the road and keeping the city safe.";
+                break;
+
+            case OTHER: buildingDescription = "A well-beaten path.";
+                break;
+        }
+
+        this.text(buildingDescription);
         this.button("okay", true);
 
         key(Input.Keys.ENTER, true);
-
+        key(Input.Buttons.RIGHT, true);
     }
 
     @Override
