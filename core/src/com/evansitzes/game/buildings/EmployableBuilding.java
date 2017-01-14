@@ -9,13 +9,20 @@ public class EmployableBuilding extends Building {
 
     private static final float TIME_UNTIL_BUILDING_UPDATE = 2;
 
+    public int maxSpritesCapacity;
+    public int currentSpritesCapacity;
+    public int spritesInField;
+
     public int maxEmployability;
     public int currentlyEmployed;
     float time;
 
+
+
     public EmployableBuilding(final CityBuildingGame game, final int tileSize, final String name, final String prettyName) {
         super(game, tileSize, name, prettyName);
         maxEmployability = 5;
+        maxSpritesCapacity = 2;
     }
 
     public void handleBuilding(final int amountToEmploy, final float delta) {
@@ -28,7 +35,14 @@ public class EmployableBuilding extends Building {
         }
 
         System.out.println("Currently Employed: " + currentlyEmployed);
+        // TODO dont hardcode this
         if (time > TIME_UNTIL_BUILDING_UPDATE) {
+            if (currentlyEmployed < 4) {
+                currentSpritesCapacity = 1;
+            } else {
+                currentSpritesCapacity = maxSpritesCapacity;
+            }
+
             time = 0;
         }
 

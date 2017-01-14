@@ -230,7 +230,7 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
 
 
         // Create sprites
-        spriteStateHandler = new SpriteStateHandler(game, buildings, this);
+        spriteStateHandler = new SpriteStateHandler(game, employableBuildings, this);
         spriteMovementHandler = new SpriteMovementHandler(game, TILE_SIZE, tilesMap);
 
         populationStateHandler = new PopulationStateHandler(houses);

@@ -16,7 +16,6 @@ public class Building {
     public Sprite sprite;
     public BuildingType buildingType;
     public int tileSize;
-    public int spritesGenerated;
     public int x;
     public int y;
 

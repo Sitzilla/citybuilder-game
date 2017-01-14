@@ -32,7 +32,13 @@ public class EmploymentStateHandler {
             totalLaborForce = (int) (totalPopulation * LABOR_FORCE_PARTICIPATION_RATE);
 
             // Spread labor evenly through employable buildings
-            final float buildingEmployablePercentage = totalLaborForce / (float) maxEmployable;
+            final float buildingEmployablePercentage;
+
+            if (maxEmployable == 0) {
+                buildingEmployablePercentage = 0;
+            } else {
+                buildingEmployablePercentage = totalLaborForce / (float) maxEmployable;
+            }
 
             for (final EmployableBuilding building : buildings) {
                 final int amountToEmploy = (int) (building.maxEmployability * buildingEmployablePercentage);

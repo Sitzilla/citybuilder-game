@@ -22,7 +22,7 @@ public class PopulationStateHandler {
         time += delta;
         int newPopulation = 0;
 
-        // Check population every 3 seconds
+        // Check population every 1 second
         if (time > 1) {
             for (final House building : houses) {
                 building.handleHouse(time);
