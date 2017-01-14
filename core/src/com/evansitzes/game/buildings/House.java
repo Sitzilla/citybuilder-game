@@ -23,7 +23,7 @@ public class House extends Building {
     public void handleHouse(float delta) {
         time += delta;
 
-        if (time > 2) {
+        if (time > TIME_UNTIL_HOME_UPDATE) {
             if (currentPeople < peopleCapacity) {
                 currentPeople++;
             }

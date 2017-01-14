@@ -1,4 +1,4 @@
-package com.evansitzes.game.population;
+package com.evansitzes.game.state.handlers;
 
 import com.evansitzes.game.buildings.House;
 

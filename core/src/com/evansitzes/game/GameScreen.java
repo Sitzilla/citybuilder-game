@@ -27,10 +27,15 @@ import com.evansitzes.game.environment.TilesMap;
 import com.evansitzes.game.helpers.Direction;
 import com.evansitzes.game.helpers.Point;
 import com.evansitzes.game.helpers.TextHelper;
-import com.evansitzes.game.people.*;
+import com.evansitzes.game.people.SpriteGenerator;
+import com.evansitzes.game.people.SpriteHelper;
+import com.evansitzes.game.people.SpriteMovementHandler;
+import com.evansitzes.game.people.SpriteShortestPathFinder;
 import com.evansitzes.game.people.sprites.Person;
-import com.evansitzes.game.population.PopulationStateHandler;
-import com.evansitzes.game.state.StateHelper;
+import com.evansitzes.game.state.SaveStateHelper;
+import com.evansitzes.game.state.handlers.EmploymentStateHandler;
+import com.evansitzes.game.state.handlers.PopulationStateHandler;
+import com.evansitzes.game.state.handlers.SpriteStateHandler;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -91,6 +96,7 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
     private final SpriteStateHandler spriteStateHandler;
     private final SpriteMovementHandler spriteMovementHandler;
     private final PopulationStateHandler populationStateHandler;
+    private final EmploymentStateHandler employmentStateHandler;
 
     public GameScreen(final CityBuildingGame game, final GameflowController gameflowController) {
         this.game = game;
@@ -109,8 +115,8 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
 //        bulldozingPixmap.dispose();
 
         // Load State
-        buildings = StateHelper.loadBuildingsState(game);
-        tilesMap = StateHelper.loadTilesState(level.mapWidth, level.mapHeight, level.tileHeight, level.tileWidth, buildings);
+        buildings = SaveStateHelper.loadBuildingsState(game);
+        tilesMap = SaveStateHelper.loadTilesState(level.mapWidth, level.mapHeight, level.tileHeight, level.tileWidth, buildings);
         houses = new ArrayList<House>();
         roads = new ArrayList<Road>();
         employableBuildings = new ArrayList<EmployableBuilding>();
@@ -171,8 +177,8 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
             @Override
             public void clicked(final InputEvent event, final float x, final float y) {
                 System.out.println("Saving!");
-                StateHelper.saveBuildingsState(buildings);
-                StateHelper.saveTilesState(tilesMap);
+                SaveStateHelper.saveBuildingsState(buildings);
+                SaveStateHelper.saveTilesState(tilesMap);
             }
         });
 
@@ -228,6 +234,7 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
         spriteMovementHandler = new SpriteMovementHandler(game, TILE_SIZE, tilesMap);
 
         populationStateHandler = new PopulationStateHandler(houses);
+        employmentStateHandler = new EmploymentStateHandler(employableBuildings);
     }
 
     @Override
@@ -286,6 +293,9 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
         populationStateHandler.handlePopulationState(delta);
         populationLabel.setText(String.valueOf(populationStateHandler.totalPopulation));
 //        stage.addActor(TextHelper.createText(String.valueOf(populationStateHandler.totalPopulation), Gdx.graphics.getWidth() - 620, Gdx.graphics.getHeight() - 35));
+
+        // Handle Employment
+        employmentStateHandler.handleEmploymentState(delta, populationStateHandler.totalPopulation);
 
         game.batch.end();
 

@@ -1,4 +1,4 @@
-package com.evansitzes.game.people;
+package com.evansitzes.game.state.handlers;
 
 import com.evansitzes.game.CityBuildingGame;
 import com.evansitzes.game.GameScreen;
