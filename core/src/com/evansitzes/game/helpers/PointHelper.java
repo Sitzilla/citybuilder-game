@@ -35,7 +35,7 @@ public class PointHelper {
         }
 
         // In lower-right quadrant
-        if (screenX > midPointX && screenX < upperBoundX &&
+        if (screenX >= midPointX && screenX < upperBoundX &&
                 screenY < midPointY && screenY > lowerBoundY) {
 
             bottomLeftCorner.x = screenX / TILE_SIZE * TILE_SIZE - TILE_SIZE * (numberOfTiles / 2);
@@ -45,19 +45,24 @@ public class PointHelper {
 
         // In upper-left quadrant
         if (screenX < midPointX && screenX > lowerBoundX &&
-                screenY > midPointY && screenY < upperBoundY) {
+                screenY >= midPointY && screenY < upperBoundY) {
             bottomLeftCorner.x = screenX / TILE_SIZE * TILE_SIZE - TILE_SIZE * ((numberOfTiles / 2) - 1);
             bottomLeftCorner.y = screenY / TILE_SIZE * TILE_SIZE - TILE_SIZE * (numberOfTiles / 2);
             return bottomLeftCorner;
         }
 
         // In upper-right quadrant
-        if (screenX > midPointX && screenX < upperBoundX &&
-                screenY > midPointY && screenY < upperBoundY) {
+        if (screenX >= midPointX && screenX < upperBoundX &&
+                screenY >= midPointY && screenY < upperBoundY) {
             bottomLeftCorner.x = screenX / TILE_SIZE * TILE_SIZE - TILE_SIZE * (numberOfTiles / 2);
             bottomLeftCorner.y = screenY / TILE_SIZE * TILE_SIZE - TILE_SIZE * (numberOfTiles / 2);
             return bottomLeftCorner;
         }
+
+//        // Middle of the quadrant
+//        if (screenX == midPointX || screenY == midPointY) {
+//            bottomLeftCorner.x
+//        }
 
         // User clicked outside of the map
         bottomLeftCorner.x = -1;
