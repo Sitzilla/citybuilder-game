@@ -3,6 +3,7 @@ package com.evansitzes.game.state;
 import com.badlogic.gdx.Gdx;
 import com.evansitzes.game.CityBuildingGame;
 import com.evansitzes.game.buildings.Building;
+import com.evansitzes.game.buildings.House;
 import com.evansitzes.game.environment.EnhancedTile;
 import com.evansitzes.game.environment.TilesMap;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -35,10 +36,17 @@ public class StateHelper {
             }
 
             for (final Structure structure : structuresEnvelope.getStructures()) {
-                final Building building = new Building(game, structure.getTileSize(), structure.getSpriteName(), structure.getPrettyName());
-                building.x = structure.getX();
-                building.y = structure.getY();
-                buildings.add(building);
+                if (structure.getSpriteName().equals("house")) {
+                    final House building = new House(game, structure.getTileSize(), structure.getSpriteName(), structure.getPrettyName());
+                    building.x = structure.getX();
+                    building.y = structure.getY();
+                    buildings.add(building);
+                } else {
+                    final Building building = new Building(game, structure.getTileSize(), structure.getSpriteName(), structure.getPrettyName());
+                    building.x = structure.getX();
+                    building.y = structure.getY();
+                    buildings.add(building);
+                }
             }
 
             return buildings;

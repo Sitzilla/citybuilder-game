@@ -18,6 +18,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.evansitzes.game.buildings.Building;
+import com.evansitzes.game.buildings.EmployableBuilding;
+import com.evansitzes.game.buildings.House;
+import com.evansitzes.game.buildings.Road;
 import com.evansitzes.game.environment.EnhancedTile;
 import com.evansitzes.game.environment.Level;
 import com.evansitzes.game.environment.TilesMap;
@@ -26,6 +29,7 @@ import com.evansitzes.game.helpers.Point;
 import com.evansitzes.game.helpers.TextHelper;
 import com.evansitzes.game.people.*;
 import com.evansitzes.game.people.sprites.Person;
+import com.evansitzes.game.population.PopulationStateHandler;
 import com.evansitzes.game.state.StateHelper;
 
 import java.util.ArrayList;
@@ -62,6 +66,8 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
     private float buildingY;
 
     private NinePatch border;
+//    private String populationLabel;
+    private Label populationLabel;
 
     private Skin skin;
     private Stage stage;
@@ -75,12 +81,16 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
     private int currentImageTilesize;
 
     private final ArrayList<Building> buildings;
+    private final ArrayList<House> houses;
+    private final ArrayList<Road> roads;
+    private final ArrayList<EmployableBuilding> employableBuildings;
 
     private final CityBuildingGame game;
     private final GameflowController gameflowController;
 
     private final SpriteStateHandler spriteStateHandler;
     private final SpriteMovementHandler spriteMovementHandler;
+    private final PopulationStateHandler populationStateHandler;
 
     public GameScreen(final CityBuildingGame game, final GameflowController gameflowController) {
         this.game = game;
@@ -101,6 +111,10 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
         // Load State
         buildings = StateHelper.loadBuildingsState(game);
         tilesMap = StateHelper.loadTilesState(level.mapWidth, level.mapHeight, level.tileHeight, level.tileWidth, buildings);
+        houses = new ArrayList<House>();
+        roads = new ArrayList<Road>();
+        employableBuildings = new ArrayList<EmployableBuilding>();
+        initializeBuildingArrays();
 
         this.tiledMapRenderer = new OrthogonalTiledMapRenderer(level.map);
         tiledMapRenderer.setView(camera);
@@ -196,8 +210,12 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
         stage.addActor(sidebarTable);
 
         // Add topbar text
+//        populationLabel = "0";
+        populationLabel = new Label("0", skin);
+        populationLabel.setPosition(Gdx.graphics.getWidth() - 625, Gdx.graphics.getHeight() - 38);
         stage.addActor(TextHelper.createText("Population: ", Gdx.graphics.getWidth() - 700, Gdx.graphics.getHeight() - 35));
-        stage.addActor(TextHelper.createText("100", Gdx.graphics.getWidth() - 620, Gdx.graphics.getHeight() - 35));
+        stage.addActor(populationLabel);
+//        stage.addActor(TextHelper.createText("100", Gdx.graphics.getWidth() - 620, Gdx.graphics.getHeight() - 35));
 
         final InputMultiplexer multiplexer = new InputMultiplexer();
         multiplexer.addProcessor(stage);
@@ -208,6 +226,8 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
         // Create sprites
         spriteStateHandler = new SpriteStateHandler(game, buildings, this);
         spriteMovementHandler = new SpriteMovementHandler(game, TILE_SIZE, tilesMap);
+
+        populationStateHandler = new PopulationStateHandler(houses);
     }
 
     @Override
@@ -262,6 +282,11 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
         spriteMovementHandler.handlePatrollingSprites(delta, spriteStateHandler.getPatrollingPersons());
         spriteMovementHandler.handleReturningHomeSprites(delta, spriteStateHandler.getReturningHomePersons());
 
+        // Handle Population
+        populationStateHandler.handlePopulationState(delta);
+        populationLabel.setText(String.valueOf(populationStateHandler.totalPopulation));
+//        stage.addActor(TextHelper.createText(String.valueOf(populationStateHandler.totalPopulation), Gdx.graphics.getWidth() - 620, Gdx.graphics.getHeight() - 35));
+
         game.batch.end();
 
         stage.act(delta);
@@ -311,7 +336,7 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
 
             // Show information popup
             if (!buildingSelected && !bulldozingEnabled) {
-                Point currentTile = getCornerTileFromMiddleArea((int) getMousePositionInGameWorld().x, (int) getMousePositionInGameWorld().y, 1);
+                final Point currentTile = getCornerTileFromMiddleArea((int) getMousePositionInGameWorld().x, (int) getMousePositionInGameWorld().y, 1);
 
                 // Out of bounds on the right (on the sidebar)
                 //TODO magic numbers
@@ -337,13 +362,31 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
         if (button == Buttons.LEFT) {
             Point currentTile = getCornerTileFromMiddleArea((int) getMousePositionInGameWorld().x, (int) getMousePositionInGameWorld().y, currentImageTilesize);
             if (buildingSelected && !isPlacementAreaOccupied(currentTile)) {
-                final Building building = new Building(game, currentImageTilesize, currentBuildingName, getCurrentBuildingPrettyName);
-                building.x = currentTile.x;
-                building.y = currentTile.y;
 
-                buildings.add(building);
-//                spriteStateHandler.refreshBuildings
-                setTileBuilding(building, currentTile);
+                if (currentBuildingName.equals("house")) {
+                    final House building = new House(game, currentImageTilesize, currentBuildingName, getCurrentBuildingPrettyName);
+                    building.x = currentTile.x;
+                    building.y = currentTile.y;
+                    buildings.add(building);
+                    houses.add(building);
+                    setTileBuilding(building, currentTile);
+                } else if (currentBuildingName.equals("road")) {
+                    final Road building = new Road(game, currentImageTilesize, currentBuildingName, getCurrentBuildingPrettyName);
+                    building.x = currentTile.x;
+                    building.y = currentTile.y;
+                    buildings.add(building);
+                    roads.add(building);
+                    setTileBuilding(building, currentTile);
+                } else if (currentBuildingName.equals("guard_house")) {
+                    final EmployableBuilding building = new EmployableBuilding(game, currentImageTilesize, currentBuildingName, getCurrentBuildingPrettyName);
+                    building.x = currentTile.x;
+                    building.y = currentTile.y;
+                    buildings.add(building);
+                    employableBuildings.add(building);
+                    setTileBuilding(building, currentTile);
+                }
+////                spriteStateHandler.refreshBuildings
+//                setTileBuilding(building, currentTile);
 //                spriteMovementHandler.setBuildings(buildings);
                 setAreDevelopedTiles(true, currentTile);
             }
@@ -355,6 +398,16 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
                 for (final Building building : buildings) {
                     if (building.overhangs(currentTile.x, currentTile.y)) {
                         buildings.remove(building);
+                        if (building.name.equals("house")) {
+                            houses.remove(building);
+                        }
+                        if (building.name.equals("road")) {
+                            roads.remove(building);
+                        }
+                        if (building.name.equals("guard_house")) {
+                            employableBuildings.remove(building);
+                        }
+
 //                        spriteMovementHandler.setBuildings(buildings);
                         //TODO tile size
                         currentTile.x = building.x;
@@ -480,6 +533,24 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
         }
 
         return false;
+    }
+
+    private void initializeBuildingArrays() {
+        // Split buildings into building types
+        for (final Building building : buildings) {
+            if (building instanceof House) {
+                houses.add((House) building);
+                continue;
+            }
+            if (building instanceof Road) {
+                roads.add((Road) building);
+                continue;
+            }
+            if (building instanceof EmployableBuilding) {
+                employableBuildings.add((EmployableBuilding) building);
+                continue;
+            }
+        }
     }
 
     private void drawTileBorder(final int bottomLeftCornerXInPixels, final int bottomLeftCornerYInPixels, final int numberOfTiles) {
