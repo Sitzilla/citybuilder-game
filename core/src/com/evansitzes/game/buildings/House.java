@@ -13,8 +13,8 @@ public class House extends Building {
     public int currentPeople;
     float time;
 
-    public House(final CityBuildingGame game, final int tileSize, final String name, final String prettyName) {
-        super(game, tileSize, name, prettyName);
+    public House(final CityBuildingGame game, final int tileSize, final String type) {
+        super(game, tileSize, type);
         peopleCapacity = 8;
         currentPeople = 0;
         time = 0;

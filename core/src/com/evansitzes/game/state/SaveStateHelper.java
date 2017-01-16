@@ -16,13 +16,15 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by evan on 10/31/16.
  */
 public class SaveStateHelper {
 
-    public static ArrayList<Building> loadBuildingsState(final CityBuildingGame game) {
+    public static ArrayList<Building> loadBuildingsState(final CityBuildingGame game, final Map<String, Definition> definitions) {
         final ObjectMapper mapper = new ObjectMapper(new YAMLFactory()); // jackson databind
         mapper.registerModule(new JodaModule());
 
@@ -39,16 +41,21 @@ public class SaveStateHelper {
 
             //TODO definitely make this more efficient
             for (final Structure structure : structuresEnvelope.getStructures()) {
+                final Definition buildingDefinition = definitions.get(structure.getSpriteName());
                 final Building building;
-                if (structure.getSpriteName().equals("house")) {
-                    building = new House(game, structure.getTileSize(), structure.getSpriteName(), structure.getPrettyName());
-                } else if (structure.getSpriteName().equals("guard_house")) {
-                    building = new EmployableBuilding(game, structure.getTileSize(), structure.getSpriteName(), structure.getPrettyName());
-                } else if (structure.getSpriteName().equals("road")) {
-                    building = new Road(game, structure.getTileSize(), structure.getSpriteName(), structure.getPrettyName());
+
+                if (buildingDefinition.getType().equals("house")) {
+                    building = buildHouse(game, structure, buildingDefinition);
+                } else if (buildingDefinition.getType().equals("employableBuilding")) {
+                    building = buildEmployableBuilding(game, structure, buildingDefinition);
+                } else if (buildingDefinition.getType().equals("road")) {
+                    building = new Road(game, structure.getTileSize(), buildingDefinition.getType());
                 } else {
-                  building = new Building(game, structure.getTileSize(), structure.getSpriteName(), structure.getPrettyName());
+                  building = new Building(game, structure.getTileSize(), buildingDefinition.getType());
                 }
+                building.name = buildingDefinition.getName();
+                building.prettyName = buildingDefinition.getPrettyName();
+                building.description = buildingDefinition.getDescription();
                 building.x = structure.getX();
                 building.y = structure.getY();
                 buildings.add(building);
@@ -61,6 +68,16 @@ public class SaveStateHelper {
         }
 
         return null;
+    }
+
+    private static House buildHouse(final CityBuildingGame game, final Structure structure, final Definition definition) {
+        return new House(game, structure.getTileSize(), definition.getType());
+    }
+
+    private static EmployableBuilding buildEmployableBuilding(final CityBuildingGame game, final Structure structure, final Definition definition) {
+        final EmployableBuilding building = new EmployableBuilding(game, structure.getTileSize(), definition.getType());
+        building.maxEmployability = definition.getMaxEmployees();
+        return building;
     }
 
     public static void saveBuildingsState(final ArrayList<Building> buildings) {
@@ -77,7 +94,6 @@ public class SaveStateHelper {
             for (final Building building : buildings) {
                 final Structure structure = new Structure();
                 structure.setSpriteName(building.name);
-                structure.setPrettyName(building.prettyName);
                 structure.setTileSize(building.tileSize);
                 structure.setX(building.x);
                 structure.setY(building.y);
@@ -140,6 +156,28 @@ public class SaveStateHelper {
         } catch (final IOException e) {
             System.out.println(e);
         }
+    }
+
+    public static Map<String, Definition> loadObjectDefinitions() {
+        final Map<String, Definition> definitions = new HashMap<String, Definition>();
+        final ObjectMapper mapper = new ObjectMapper(new YAMLFactory()); // jackson databind
+        mapper.registerModule(new JodaModule());
+
+        try {
+            final File file = new File(String.valueOf(Gdx.files.local("configurations/definitions.yml")));
+
+            for (final Definition definition : mapper.readValue(file, DefinitionsEnvelope.class).getDefinitions()) {
+                definitions.put(definition.getName(), definition);
+            }
+            //            final DefinitionsEnvelope definitionsEnvelope = mapper.readValue(file, DefinitionsEnvelope.class);
+//            final List<Definition> definitions = new ArrayList<Definition>();Definition
+
+            return definitions;
+        } catch (final IOException e) {
+            System.out.println(e);
+        }
+
+        return null;
     }
 
 }

@@ -26,17 +26,7 @@ public class BasicInformationPopup extends Dialog {
         this.text(building.prettyName);
         this.getContentTable().row();
 
-        String buildingDescription = "";
-        switch (building.buildingType) {
-            case RESIDENTIAL: buildingDescription = "A basic house. People living here have the bare minimum needs.";
-                                break;
-
-            case EMPLOYABLE: buildingDescription = "The guards here are patrolling the road and keeping the city safe.";
-                break;
-
-            case OTHER: buildingDescription = "A well-beaten path.";
-                break;
-        }
+        final String buildingDescription = building.description;
 
         this.text(buildingDescription);
         this.button("okay", true);

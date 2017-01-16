@@ -32,6 +32,7 @@ import com.evansitzes.game.people.SpriteHelper;
 import com.evansitzes.game.people.SpriteMovementHandler;
 import com.evansitzes.game.people.SpriteShortestPathFinder;
 import com.evansitzes.game.people.sprites.Person;
+import com.evansitzes.game.state.Definition;
 import com.evansitzes.game.state.SaveStateHelper;
 import com.evansitzes.game.state.handlers.EmploymentStateHandler;
 import com.evansitzes.game.state.handlers.PopulationStateHandler;
@@ -39,6 +40,7 @@ import com.evansitzes.game.state.handlers.SpriteStateHandler;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static com.evansitzes.game.helpers.PointHelper.getCornerTileFromMiddleArea;
 import static com.evansitzes.game.people.SpriteHelper.getNextXCornerTileFromDirection;
@@ -89,6 +91,7 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
     private final ArrayList<House> houses;
     private final ArrayList<Road> roads;
     private final ArrayList<EmployableBuilding> employableBuildings;
+    private final Map<String, Definition> objectDefinitions;
 
     private final CityBuildingGame game;
     private final GameflowController gameflowController;
@@ -115,7 +118,8 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
 //        bulldozingPixmap.dispose();
 
         // Load State
-        buildings = SaveStateHelper.loadBuildingsState(game);
+        objectDefinitions = SaveStateHelper.loadObjectDefinitions();
+        buildings = SaveStateHelper.loadBuildingsState(game, objectDefinitions);
         tilesMap = SaveStateHelper.loadTilesState(level.mapWidth, level.mapHeight, level.tileHeight, level.tileWidth, buildings);
         houses = new ArrayList<House>();
         roads = new ArrayList<Road>();
@@ -372,23 +376,35 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
         if (button == Buttons.LEFT) {
             Point currentTile = getCornerTileFromMiddleArea((int) getMousePositionInGameWorld().x, (int) getMousePositionInGameWorld().y, currentImageTilesize);
             if (buildingSelected && !isPlacementAreaOccupied(currentTile)) {
+                final Definition buildingDefinition = objectDefinitions.get(currentBuildingName);
 
+                // TODO refactor this out
                 if (currentBuildingName.equals("house")) {
-                    final House building = new House(game, currentImageTilesize, currentBuildingName, getCurrentBuildingPrettyName);
+                    final House building = new House(game, currentImageTilesize, buildingDefinition.getType());
+                    building.name = buildingDefinition.getName();
+                    building.prettyName = buildingDefinition.getPrettyName();
+                    building.description = buildingDefinition.getDescription();
                     building.x = currentTile.x;
                     building.y = currentTile.y;
                     buildings.add(building);
                     houses.add(building);
                     setTileBuilding(building, currentTile);
                 } else if (currentBuildingName.equals("road")) {
-                    final Road building = new Road(game, currentImageTilesize, currentBuildingName, getCurrentBuildingPrettyName);
+                    final Road building = new Road(game, currentImageTilesize, buildingDefinition.getType());
+                    building.name = buildingDefinition.getName();
+                    building.prettyName = buildingDefinition.getPrettyName();
+                    building.description = buildingDefinition.getDescription();
                     building.x = currentTile.x;
                     building.y = currentTile.y;
                     buildings.add(building);
                     roads.add(building);
                     setTileBuilding(building, currentTile);
                 } else if (currentBuildingName.equals("guard_house")) {
-                    final EmployableBuilding building = new EmployableBuilding(game, currentImageTilesize, currentBuildingName, getCurrentBuildingPrettyName);
+                    final EmployableBuilding building = new EmployableBuilding(game, currentImageTilesize, buildingDefinition.getType());
+                    building.name = buildingDefinition.getName();
+                    building.prettyName = buildingDefinition.getPrettyName();
+                    building.description = buildingDefinition.getDescription();
+                    building.maxEmployability = buildingDefinition.getMaxEmployees();
                     building.x = currentTile.x;
                     building.y = currentTile.y;
                     buildings.add(building);

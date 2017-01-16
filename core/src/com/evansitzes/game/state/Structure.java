@@ -10,9 +10,6 @@ public class Structure {
     @JsonProperty("sprite_name")
     private String spriteName;
 
-    @JsonProperty("pretty_name")
-    private String prettyName;
-
     @JsonProperty("tile_size")
     private int tileSize;
 
@@ -31,14 +28,6 @@ public class Structure {
 
     public void setSpriteName(final String spriteName) {
         this.spriteName = spriteName;
-    }
-
-    public String getPrettyName() {
-        return prettyName;
-    }
-
-    public void setPrettyName(final String prettyName) {
-        this.prettyName = prettyName;
     }
 
     public int getTileSize() {
@@ -69,7 +58,6 @@ public class Structure {
     public String toString() {
         return "Structure{" +
                 "spriteName='" + spriteName + '\'' +
-                ", prettyName='" + prettyName + '\'' +
                 ", tileSize=" + tileSize +
                 ", x=" + x +
                 ", y=" + y +

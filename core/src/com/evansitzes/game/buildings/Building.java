@@ -13,6 +13,7 @@ public class Building {
     public final CityBuildingGame game;
     public String name;
     public String prettyName;
+    public String description;
     public Sprite sprite;
     public BuildingType buildingType;
     public int tileSize;
@@ -23,18 +24,16 @@ public class Building {
         RESIDENTIAL, EMPLOYABLE, OTHER
     }
 
-    public Building(final CityBuildingGame game, final int tileSize, final String name, final String prettyName) {
+    public Building(final CityBuildingGame game, final int tileSize, final String type) {
         this.game = game;
-        sprite = new Sprite(getBuildingSprite(name));
+        sprite = new Sprite(getBuildingSprite(type));
         this.tileSize = tileSize;
         sprite.setSize(32 * tileSize, 32 * tileSize);
-        this.name = name;
-        this.prettyName = prettyName;
 
         //TODO this is implemented terribly
-        if (name.equals("house")) {
+        if (type.equals("house")) {
             this.buildingType = BuildingType.RESIDENTIAL;
-        } else if (name.equals("guard_house")) {
+        } else if (type.equals("guard_house")) {
             this.buildingType = BuildingType.EMPLOYABLE;
         } else {
             this.buildingType = BuildingType.OTHER;
@@ -47,16 +46,16 @@ public class Building {
     }
 
     //TODO replace this with some kind of configuration lookup
-    private TextureRegion getBuildingSprite(final String name) {
-        if (name.equals("house")) {
+    private TextureRegion getBuildingSprite(final String type) {
+        if (type.equals("house")) {
             return Textures.Sidebar.HOUSE;
         }
 
-        if (name.equals("road")) {
+        if (type.equals("road")) {
             return Textures.Road.VERTICLE_ROAD;
         }
 
-        if (name.equals("guard_house")) {
+        if (type.equals("employableBuilding")) {
             return Textures.Sidebar.GUARD_HOUSE;
         }
 

@@ -19,9 +19,8 @@ public class EmployableBuilding extends Building {
 
 
 
-    public EmployableBuilding(final CityBuildingGame game, final int tileSize, final String name, final String prettyName) {
-        super(game, tileSize, name, prettyName);
-        maxEmployability = 5;
+    public EmployableBuilding(final CityBuildingGame game, final int tileSize, final String type) {
+        super(game, tileSize, type);
         maxSpritesCapacity = 2;
     }
 
