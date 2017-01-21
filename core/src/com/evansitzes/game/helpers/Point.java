@@ -6,8 +6,19 @@ package com.evansitzes.game.helpers;
 public class Point {
     public int x;
     public int y;
+    public int tileX;
+    public int tileY;
 
     public Point() {
     }
 
+    @Override
+    public String toString() {
+        return "Point{" +
+                "x=" + x +
+                ", y=" + y +
+                ", tileX=" + tileX +
+                ", tileY=" + tileY +
+                '}';
+    }
 }

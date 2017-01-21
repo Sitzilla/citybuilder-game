@@ -42,6 +42,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import static com.evansitzes.game.helpers.DraggingHelper.calculateDraggingPoints;
+import static com.evansitzes.game.helpers.DraggingHelper.createDraggedRoads;
 import static com.evansitzes.game.helpers.PointHelper.getCornerTileFromMiddleArea;
 import static com.evansitzes.game.people.SpriteHelper.getNextXCornerTileFromDirection;
 import static com.evansitzes.game.people.SpriteHelper.getNextYCornerTileFromDirection;
@@ -100,6 +102,12 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
     private final SpriteMovementHandler spriteMovementHandler;
     private final PopulationStateHandler populationStateHandler;
     private final EmploymentStateHandler employmentStateHandler;
+
+    private List<Point> draggedPoints = new ArrayList<Point>();
+    private List<Road> draggedRoads = new ArrayList<Road>();
+    private Point startDraggingPoint = new Point();
+    private Point currentDraggingPoint = new Point();
+    private boolean isDragging;
 
     public GameScreen(final CityBuildingGame game, final GameflowController gameflowController) {
         this.game = game;
@@ -257,6 +265,18 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
 
         game.batch.begin();
 
+        // Dragging redering logic
+        if (isDragging) {
+            currentDraggingPoint = getCornerTileFromMiddleArea((int) getMousePositionInGameWorld().x, (int) getMousePositionInGameWorld().y, currentImageTilesize);
+            draggedPoints = calculateDraggingPoints(startDraggingPoint, currentDraggingPoint, TILE_SIZE);
+            draggedRoads = createDraggedRoads(game, draggedPoints);
+
+            for (final Road road : draggedRoads) {
+                road.draw();
+            }
+        }
+
+        // Draw selected building around mouse
         if (buildingSelected) {
             final Point currentTile = getCornerTileFromMiddleArea((int) getMousePositionInGameWorld().x, (int) getMousePositionInGameWorld().y, currentImageTilesize);
 
@@ -374,6 +394,18 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
         }
 
         if (button == Buttons.LEFT) {
+
+            // Drag and Build logic
+            if (buildingSelected && currentBuildingName.equals("road")) {
+                isDragging = true;
+                startDraggingPoint = getCornerTileFromMiddleArea((int) getMousePositionInGameWorld().x, (int) getMousePositionInGameWorld().y, currentImageTilesize);
+                startDraggingPoint.tileX = startDraggingPoint.x / TILE_SIZE;
+                startDraggingPoint.tileY = startDraggingPoint.y / TILE_SIZE;
+                System.out.println(startDraggingPoint);
+                return false;
+            }
+
+            // Place normal building
             Point currentTile = getCornerTileFromMiddleArea((int) getMousePositionInGameWorld().x, (int) getMousePositionInGameWorld().y, currentImageTilesize);
             if (buildingSelected && !isPlacementAreaOccupied(currentTile)) {
                 final Definition buildingDefinition = objectDefinitions.get(currentBuildingName);
@@ -453,11 +485,41 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
 
     @Override
     public boolean touchUp(final int screenX, final int screenY, final int pointer, final int button) {
+
+        if (isDragging) {
+            final Definition buildingDefinition = objectDefinitions.get("road");
+
+            for (final Road road : draggedRoads) {
+                final Point currentTile = new Point();
+                currentTile.x = road.x;
+                currentTile.y = road.y;
+
+                if (isPlacementAreaOccupied(currentTile)) {
+                    continue;
+                }
+
+                road.name = buildingDefinition.getName();
+                road.prettyName = buildingDefinition.getPrettyName();
+                road.description = buildingDefinition.getDescription();
+                buildings.add(road);
+                roads.add(road);
+                setTileBuilding(road, currentTile);
+                setAreDevelopedTiles(true, currentTile);
+
+            }
+
+            draggedRoads.clear();
+            draggedPoints.clear();
+            isDragging = false;
+        }
+
         return false;
     }
 
     @Override
     public boolean touchDragged(final int screenX, final int screenY, final int pointer) {
+
+
         return false;
     }
 
@@ -585,4 +647,6 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
         border.draw(game.batch, bottomLeftCornerXInPixels, bottomLeftCornerYInPixels + TILE_SIZE * numberOfTiles, TILE_SIZE * numberOfTiles + BORDER_WIDTH, BORDER_WIDTH);
         border.draw(game.batch, bottomLeftCornerXInPixels + TILE_SIZE * numberOfTiles, bottomLeftCornerYInPixels, BORDER_WIDTH,  TILE_SIZE * numberOfTiles + BORDER_WIDTH);
     }
+
+
 }
