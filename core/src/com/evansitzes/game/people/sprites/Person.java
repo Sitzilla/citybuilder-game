@@ -5,6 +5,7 @@ import com.evansitzes.game.Configuration;
 import com.evansitzes.game.GameScreen;
 import com.evansitzes.game.Textures;
 import com.evansitzes.game.buildings.Building;
+import com.evansitzes.game.buildings.EmployableBuilding;
 import com.evansitzes.game.helpers.Direction;
 
 import java.util.Stack;
@@ -23,7 +24,7 @@ public class Person extends Entity {
     private final GameScreen screen;
     public SimpleSprite currentSprite;
     public AnimatedSprite animatedSprite;
-    public Building homeBuilding;
+    public EmployableBuilding homeBuilding;
     Configuration configuration;
 
 
@@ -50,7 +51,7 @@ public class Person extends Entity {
     public Facing direction;
 
 
-    public Person(final CityBuildingGame game, final GameScreen screen, final String name, final Building homeBuilding, final int x, final int y) {
+    public Person(final CityBuildingGame game, final GameScreen screen, final String name, final EmployableBuilding homeBuilding, final int x, final int y) {
         super(game);
         this.name = name;
         this.screen = screen;

@@ -1184,10 +1184,10 @@ tiles:
   occupied: false
 - x: 12
   y: 10
-  occupied: false
+  occupied: true
 - x: 12
   y: 11
-  occupied: false
+  occupied: true
 - x: 12
   y: 12
   occupied: false
@@ -1280,10 +1280,10 @@ tiles:
   occupied: false
 - x: 13
   y: 10
-  occupied: false
+  occupied: true
 - x: 13
   y: 11
-  occupied: false
+  occupied: true
 - x: 13
   y: 12
   occupied: false
@@ -1355,31 +1355,31 @@ tiles:
   occupied: false
 - x: 14
   y: 3
-  occupied: false
+  occupied: true
 - x: 14
   y: 4
-  occupied: false
+  occupied: true
 - x: 14
   y: 5
-  occupied: false
+  occupied: true
 - x: 14
   y: 6
-  occupied: false
+  occupied: true
 - x: 14
   y: 7
-  occupied: false
+  occupied: true
 - x: 14
   y: 8
-  occupied: false
+  occupied: true
 - x: 14
   y: 9
-  occupied: false
+  occupied: true
 - x: 14
   y: 10
-  occupied: false
+  occupied: true
 - x: 14
   y: 11
-  occupied: false
+  occupied: true
 - x: 14
   y: 12
   occupied: false
@@ -1451,7 +1451,7 @@ tiles:
   occupied: false
 - x: 15
   y: 3
-  occupied: false
+  occupied: true
 - x: 15
   y: 4
   occupied: false
@@ -1475,7 +1475,7 @@ tiles:
   occupied: false
 - x: 15
   y: 11
-  occupied: false
+  occupied: true
 - x: 15
   y: 12
   occupied: false
@@ -1547,7 +1547,7 @@ tiles:
   occupied: false
 - x: 16
   y: 3
-  occupied: false
+  occupied: true
 - x: 16
   y: 4
   occupied: false
@@ -1571,7 +1571,7 @@ tiles:
   occupied: false
 - x: 16
   y: 11
-  occupied: false
+  occupied: true
 - x: 16
   y: 12
   occupied: false
@@ -1643,7 +1643,7 @@ tiles:
   occupied: false
 - x: 17
   y: 3
-  occupied: false
+  occupied: true
 - x: 17
   y: 4
   occupied: false
@@ -1667,7 +1667,7 @@ tiles:
   occupied: false
 - x: 17
   y: 11
-  occupied: false
+  occupied: true
 - x: 17
   y: 12
   occupied: false
@@ -1739,13 +1739,13 @@ tiles:
   occupied: false
 - x: 18
   y: 3
-  occupied: false
+  occupied: true
 - x: 18
   y: 4
-  occupied: false
+  occupied: true
 - x: 18
   y: 5
-  occupied: false
+  occupied: true
 - x: 18
   y: 6
   occupied: false
@@ -1763,7 +1763,7 @@ tiles:
   occupied: false
 - x: 18
   y: 11
-  occupied: false
+  occupied: true
 - x: 18
   y: 12
   occupied: false
@@ -1835,13 +1835,13 @@ tiles:
   occupied: false
 - x: 19
   y: 3
-  occupied: false
+  occupied: true
 - x: 19
   y: 4
-  occupied: false
+  occupied: true
 - x: 19
   y: 5
-  occupied: false
+  occupied: true
 - x: 19
   y: 6
   occupied: false
@@ -1859,7 +1859,7 @@ tiles:
   occupied: false
 - x: 19
   y: 11
-  occupied: false
+  occupied: true
 - x: 19
   y: 12
   occupied: false
@@ -1931,7 +1931,7 @@ tiles:
   occupied: false
 - x: 20
   y: 3
-  occupied: false
+  occupied: true
 - x: 20
   y: 4
   occupied: false
@@ -1952,7 +1952,7 @@ tiles:
   occupied: false
 - x: 20
   y: 10
-  occupied: true
+  occupied: false
 - x: 20
   y: 11
   occupied: true
@@ -2027,7 +2027,7 @@ tiles:
   occupied: false
 - x: 21
   y: 3
-  occupied: false
+  occupied: true
 - x: 21
   y: 4
   occupied: false
@@ -2042,7 +2042,7 @@ tiles:
   occupied: false
 - x: 21
   y: 8
-  occupied: true
+  occupied: false
 - x: 21
   y: 9
   occupied: true
@@ -2057,10 +2057,10 @@ tiles:
   occupied: false
 - x: 21
   y: 13
-  occupied: true
+  occupied: false
 - x: 21
   y: 14
-  occupied: true
+  occupied: false
 - x: 21
   y: 15
   occupied: false
@@ -2123,7 +2123,7 @@ tiles:
   occupied: false
 - x: 22
   y: 3
-  occupied: false
+  occupied: true
 - x: 22
   y: 4
   occupied: false
@@ -2138,7 +2138,7 @@ tiles:
   occupied: false
 - x: 22
   y: 8
-  occupied: true
+  occupied: false
 - x: 22
   y: 9
   occupied: true
@@ -2150,13 +2150,13 @@ tiles:
   occupied: true
 - x: 22
   y: 12
-  occupied: true
+  occupied: false
 - x: 22
   y: 13
-  occupied: true
+  occupied: false
 - x: 22
   y: 14
-  occupied: true
+  occupied: false
 - x: 22
   y: 15
   occupied: false
@@ -2219,7 +2219,7 @@ tiles:
   occupied: false
 - x: 23
   y: 3
-  occupied: false
+  occupied: true
 - x: 23
   y: 4
   occupied: false
@@ -2240,13 +2240,13 @@ tiles:
   occupied: false
 - x: 23
   y: 10
-  occupied: true
-- x: 23
-  y: 11
   occupied: false
 - x: 23
-  y: 12
+  y: 11
   occupied: true
+- x: 23
+  y: 12
+  occupied: false
 - x: 23
   y: 13
   occupied: false
@@ -2315,13 +2315,13 @@ tiles:
   occupied: false
 - x: 24
   y: 3
-  occupied: false
+  occupied: true
 - x: 24
   y: 4
-  occupied: false
+  occupied: true
 - x: 24
   y: 5
-  occupied: false
+  occupied: true
 - x: 24
   y: 6
   occupied: false
@@ -2336,13 +2336,13 @@ tiles:
   occupied: false
 - x: 24
   y: 10
-  occupied: true
-- x: 24
-  y: 11
   occupied: false
 - x: 24
-  y: 12
+  y: 11
   occupied: true
+- x: 24
+  y: 12
+  occupied: false
 - x: 24
   y: 13
   occupied: false
@@ -2411,13 +2411,13 @@ tiles:
   occupied: false
 - x: 25
   y: 3
-  occupied: false
+  occupied: true
 - x: 25
   y: 4
-  occupied: false
+  occupied: true
 - x: 25
   y: 5
-  occupied: false
+  occupied: true
 - x: 25
   y: 6
   occupied: false
@@ -2426,13 +2426,13 @@ tiles:
   occupied: false
 - x: 25
   y: 8
-  occupied: true
+  occupied: false
 - x: 25
   y: 9
-  occupied: true
+  occupied: false
 - x: 25
   y: 10
-  occupied: true
+  occupied: false
 - x: 25
   y: 11
   occupied: true
@@ -2441,7 +2441,7 @@ tiles:
   occupied: true
 - x: 25
   y: 13
-  occupied: false
+  occupied: true
 - x: 25
   y: 14
   occupied: false
@@ -2507,19 +2507,19 @@ tiles:
   occupied: false
 - x: 26
   y: 3
-  occupied: false
+  occupied: true
 - x: 26
   y: 4
-  occupied: false
+  occupied: true
 - x: 26
   y: 5
-  occupied: false
+  occupied: true
 - x: 26
   y: 6
-  occupied: false
+  occupied: true
 - x: 26
   y: 7
-  occupied: false
+  occupied: true
 - x: 26
   y: 8
   occupied: true
@@ -2534,10 +2534,10 @@ tiles:
   occupied: true
 - x: 26
   y: 12
-  occupied: false
+  occupied: true
 - x: 26
   y: 13
-  occupied: false
+  occupied: true
 - x: 26
   y: 14
   occupied: false
@@ -2621,13 +2621,13 @@ tiles:
   occupied: false
 - x: 27
   y: 9
-  occupied: false
+  occupied: true
 - x: 27
   y: 10
   occupied: true
 - x: 27
   y: 11
-  occupied: true
+  occupied: false
 - x: 27
   y: 12
   occupied: false
@@ -2717,10 +2717,10 @@ tiles:
   occupied: false
 - x: 28
   y: 9
-  occupied: false
+  occupied: true
 - x: 28
   y: 10
-  occupied: false
+  occupied: true
 - x: 28
   y: 11
   occupied: false

@@ -2,6 +2,7 @@ package com.evansitzes.game.buildings;
 
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.evansitzes.game.CityBuildingGame;
 import com.evansitzes.game.Textures;
 
@@ -15,6 +16,7 @@ public class Building {
     public String prettyName;
     public String description;
     public Sprite sprite;
+    public TextureRegionDrawable image;
     public BuildingType buildingType;
     public int tileSize;
     public int x;
@@ -26,6 +28,7 @@ public class Building {
 
     public Building(final CityBuildingGame game, final int tileSize, final String type) {
         this.game = game;
+        image = new TextureRegionDrawable(getBuildingSprite(type));
         sprite = new Sprite(getBuildingSprite(type));
         this.tileSize = tileSize;
         sprite.setSize(32 * tileSize, 32 * tileSize);
@@ -33,7 +36,7 @@ public class Building {
         //TODO this is implemented terribly
         if (type.equals("house")) {
             this.buildingType = BuildingType.RESIDENTIAL;
-        } else if (type.equals("guard_house")) {
+        } else if (type.equals("employableBuilding")) {
             this.buildingType = BuildingType.EMPLOYABLE;
         } else {
             this.buildingType = BuildingType.OTHER;

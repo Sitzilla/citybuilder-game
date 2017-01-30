@@ -19,6 +19,9 @@ public class Definition {
     @JsonProperty
     private String description;
 
+    @JsonProperty("tile_size")
+    private int tileSize;
+
     @JsonProperty("max_employees")
     private int maxEmployees;
 
@@ -26,7 +29,7 @@ public class Definition {
         return name;
     }
 
-    public void setName(String name) {
+    public void setName(final String name) {
         this.name = name;
     }
 
@@ -34,7 +37,7 @@ public class Definition {
         return prettyName;
     }
 
-    public void setPrettyName(String prettyName) {
+    public void setPrettyName(final String prettyName) {
         this.prettyName = prettyName;
     }
 
@@ -42,7 +45,7 @@ public class Definition {
         return type;
     }
 
-    public void setType(String type) {
+    public void setType(final String type) {
         this.type = type;
     }
 
@@ -50,15 +53,23 @@ public class Definition {
         return description;
     }
 
-    public void setDescription(String description) {
+    public void setDescription(final String description) {
         this.description = description;
+    }
+
+    public int getTileSize() {
+        return tileSize;
+    }
+
+    public void setTileSize(final int tileSize) {
+        this.tileSize = tileSize;
     }
 
     public int getMaxEmployees() {
         return maxEmployees;
     }
 
-    public void setMaxEmployees(int maxEmployees) {
+    public void setMaxEmployees(final int maxEmployees) {
         this.maxEmployees = maxEmployees;
     }
 
@@ -69,6 +80,7 @@ public class Definition {
                 ", prettyName='" + prettyName + '\'' +
                 ", type='" + type + '\'' +
                 ", description='" + description + '\'' +
+                ", tileSize='" + tileSize + '\'' +
                 ", maxEmployees=" + maxEmployees +
                 '}';
     }

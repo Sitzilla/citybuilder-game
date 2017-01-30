@@ -2,7 +2,7 @@ package com.evansitzes.game.people.sprites;
 
 import com.evansitzes.game.CityBuildingGame;
 import com.evansitzes.game.GameScreen;
-import com.evansitzes.game.buildings.Building;
+import com.evansitzes.game.buildings.EmployableBuilding;
 import org.joda.time.DateTime;
 
 /**
@@ -17,7 +17,7 @@ public class PatrolPerson extends Person {
     public float maxTimeInField;
     public float currentTimeInField;
 
-    public PatrolPerson(final CityBuildingGame game, final GameScreen screen, final String name, final Building homeBuilding, final float maxTimeInField, final int x, final int y) {
+    public PatrolPerson(final CityBuildingGame game, final GameScreen screen, final String name, final EmployableBuilding homeBuilding, final float maxTimeInField, final int x, final int y) {
         super(game, screen, name, homeBuilding, x, y);
 
         this.maxTimeInField = maxTimeInField;

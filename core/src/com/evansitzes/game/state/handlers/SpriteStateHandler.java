@@ -50,6 +50,7 @@ public class SpriteStateHandler {
                 final Person person = returningIterator.next();
 
                 if (person.pathHome.isEmpty()) {
+                    person.homeBuilding.spritesInField--;
                     returningIterator.remove();
                 }
 
