@@ -38,7 +38,7 @@ public class SpriteStateHandler {
         if (time > 1) {
             //TODO no need to check this 3 times a second
             for (final EmployableBuilding building : buildings) {
-                if (building.name.equals("guard_house") && building.spritesInField < building.currentSpritesCapacity) {
+                if (building.name.equals("guard_house") && building.spritesInField < building.currentSpritesCapacity && building.isConnectedToRoad) {
                     building.spritesInField++;
                     gameScreen.createNewSprite("guard", building.x, building.y, building);
                 }

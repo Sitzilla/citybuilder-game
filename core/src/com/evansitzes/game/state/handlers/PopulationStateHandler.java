@@ -25,8 +25,10 @@ public class PopulationStateHandler {
         // Check population every 1 second
         if (time > 1) {
             for (final House building : houses) {
-                building.handleHouse(time);
-                newPopulation += building.currentPeople;
+                if (building.isConnectedToRoad) {
+                    building.handleHouse(time);
+                    newPopulation += building.currentPeople;
+                }
             }
             time = 0;
             totalPopulation = newPopulation;
