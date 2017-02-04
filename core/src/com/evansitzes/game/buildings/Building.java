@@ -11,7 +11,7 @@ import com.evansitzes.game.Textures;
  */
 public class Building {
 
-    public final CityBuildingGame game;
+    public CityBuildingGame game;
     public String name;
     public String prettyName;
     public String description;
@@ -24,6 +24,9 @@ public class Building {
 
     public enum BuildingType {
         RESIDENTIAL, EMPLOYABLE, OTHER
+    }
+
+    public Building() {
     }
 
     public Building(final CityBuildingGame game, final int tileSize, final String type) {

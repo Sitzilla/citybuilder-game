@@ -25,4 +25,10 @@ public class BuildingHelper {
 
         return building;
     }
+
+    public static Building createBlankBuilding(final CityBuildingGame game) {
+        final Building building = new Building();
+        building.tileSize = 1;
+        return building;
+    }
 }
