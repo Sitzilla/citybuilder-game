@@ -29,10 +29,17 @@ public class BasicInformationPopup extends Dialog {
         final String buildingDescription = building.description;
 
         this.text(buildingDescription);
+        this.getContentTable().row();
+
+        if (!building.isConnectedToRoad) {
+            this.text("Warning! Building is not connected to a road.");
+        }
+
         this.button("okay", true);
 
         key(Input.Keys.ENTER, true);
-        key(Input.Buttons.RIGHT, true);
+        key(Input.Keys.ANY_KEY, true);
+        key(Input.Buttons.LEFT, true);
     }
 
     @Override

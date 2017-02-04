@@ -19,6 +19,7 @@ public class Building {
     public Sprite sprite;
     public TextureRegionDrawable image;
     public BuildingType buildingType;
+    public boolean isConnectedToRoad;
     public int tileSize;
     public int x;
     public int y;

@@ -137,7 +137,7 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
 
         // Load State
         objectDefinitions = SaveStateHelper.loadObjectDefinitions();
-        buildingHelper = new BuildingHelper(objectDefinitions);
+        buildingHelper = new BuildingHelper(objectDefinitions, TILE_SIZE);
         buildings = SaveStateHelper.loadBuildingsState(game, objectDefinitions);
         tilesMap = SaveStateHelper.loadTilesState(level.mapWidth, level.mapHeight, level.tileHeight, level.tileWidth, buildings);
         houses = new ArrayList<House>();
@@ -145,6 +145,11 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
         employableBuildings = new ArrayList<EmployableBuilding>();
         selectedBuilding = createBlankBuilding(game);
         initializeBuildingArrays();
+
+        // Load Road-Connectivity
+        for (final Building building : buildings) {
+            building.isConnectedToRoad = BuildingHelper.isBuildingConnectedToRoad(building, tilesMap);
+        }
 
         this.tiledMapRenderer = new OrthogonalTiledMapRenderer(level.map);
         tiledMapRenderer.setView(camera);
@@ -458,19 +463,27 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
                     building.description = buildingDefinition.getDescription();
                     building.x = currentTile.x;
                     building.y = currentTile.y;
+                    building.isConnectedToRoad = BuildingHelper.isBuildingConnectedToRoad(building, tilesMap);
                     buildings.add(building);
                     houses.add(building);
                     setTileBuilding(building, currentTile);
                 } else if (selectedBuilding.name.equals("road")) {
-                    final Road building = new Road(game, selectedBuilding.tileSize, buildingDefinition.getType());
-                    building.name = buildingDefinition.getName();
-                    building.prettyName = buildingDefinition.getPrettyName();
-                    building.description = buildingDefinition.getDescription();
-                    building.x = currentTile.x;
-                    building.y = currentTile.y;
-                    buildings.add(building);
-                    roads.add(building);
-                    setTileBuilding(building, currentTile);
+                    final Road road = new Road(game, selectedBuilding.tileSize, buildingDefinition.getType());
+                    road.name = buildingDefinition.getName();
+                    road.prettyName = buildingDefinition.getPrettyName();
+                    road.description = buildingDefinition.getDescription();
+                    road.x = currentTile.x;
+                    road.y = currentTile.y;
+                    buildings.add(road);
+                    roads.add(road);
+                    setTileBuilding(road, currentTile);
+
+                    // TODO there is some double calculating here we could refactor out
+                    setAreDevelopedTiles(true, currentTile);
+                    for (final Building building : BuildingHelper.getAdjacentBuildings(road, tilesMap)) {
+                        building.isConnectedToRoad = BuildingHelper.isBuildingConnectedToRoad(building, tilesMap);
+                    }
+
                 } else if (selectedBuilding.name.equals("guard_house")) {
                     final EmployableBuilding building = new EmployableBuilding(game, selectedBuilding.tileSize, buildingDefinition.getType());
                     building.name = buildingDefinition.getName();
@@ -479,6 +492,7 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
                     building.maxEmployability = buildingDefinition.getMaxEmployees();
                     building.x = currentTile.x;
                     building.y = currentTile.y;
+                    building.isConnectedToRoad = BuildingHelper.isBuildingConnectedToRoad(building, tilesMap);
                     buildings.add(building);
                     employableBuildings.add(building);
                     setTileBuilding(building, currentTile);
@@ -490,6 +504,7 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
                     building.maxEmployability = buildingDefinition.getMaxEmployees();
                     building.x = currentTile.x;
                     building.y = currentTile.y;
+                    building.isConnectedToRoad = BuildingHelper.isBuildingConnectedToRoad(building, tilesMap);
                     buildings.add(building);
                     employableBuildings.add(building);
                     setTileBuilding(building, currentTile);
@@ -532,6 +547,10 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
                 setTileBuilding(road, currentTile);
                 setAreDevelopedTiles(true, currentTile);
 
+                // TODO there is some double calculating here we could refactor out
+                for (final Building building : BuildingHelper.getAdjacentBuildings(road, tilesMap)) {
+                    building.isConnectedToRoad = BuildingHelper.isBuildingConnectedToRoad(building, tilesMap);
+                }
             }
 
             draggedRoads.clear();
@@ -633,6 +652,13 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
                 selectedBuilding.tileSize = building.tileSize;
                 setTileBuilding(null, currentTile);
                 setAreDevelopedTiles(false, currentTile);
+
+                // TODO there is some double calculating here we could refactor out
+                if (building.name.equals("road")) {
+                    for (final Building adjacentBuilding : BuildingHelper.getAdjacentBuildings((Road) building, tilesMap)) {
+                        adjacentBuilding.isConnectedToRoad = BuildingHelper.isBuildingConnectedToRoad(adjacentBuilding, tilesMap);
+                    }
+                }
                 break;
             }
         }
@@ -669,8 +695,12 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
     private boolean isPlacementAreaOccupied(final Point currentTile) {
         for (int i = 0; i < selectedBuilding.tileSize; i++) {
             for (int j = 0; j < selectedBuilding.tileSize; j++) {
-                if (tilesMap.getTile(currentTile.x / TILE_SIZE + i, currentTile.y / TILE_SIZE + j).isOccupied()) {
-                    return true;
+                try {
+                    if (tilesMap.getTile(currentTile.x / TILE_SIZE + i, currentTile.y / TILE_SIZE + j).isOccupied()) {
+                        return true;
+                    }
+                } catch (final NullPointerException e) {
+                    System.out.println("Placed building on the edge.");
                 }
             }
         }

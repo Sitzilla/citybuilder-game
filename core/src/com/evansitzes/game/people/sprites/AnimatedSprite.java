@@ -3,7 +3,8 @@ package com.evansitzes.game.people.sprites;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.evansitzes.game.CityBuildingGame;
-import com.evansitzes.game.Textures;
+import com.evansitzes.game.Textures.People;
+import com.evansitzes.game.people.sprites.Person.Facing;
 
 /**
  * Created by evan on 12/29/16.
@@ -26,10 +27,10 @@ public class AnimatedSprite extends Entity {
 
     public AnimatedSprite(final CityBuildingGame game, final String name) {
         super(game);
-        upWalking = Textures.People.loadWalkingUp(name);
-        downWalking = Textures.People.loadWalkingDown(name);
-        rightWalking = Textures.People.loadWalkingRight(name);
-        leftWalking = Textures.People.loadWalkingLeft(name);
+        upWalking = People.loadWalkingUp(name);
+        downWalking = People.loadWalkingDown(name);
+        rightWalking = People.loadWalkingRight(name);
+        leftWalking = People.loadWalkingLeft(name);
 
         this.game = game;
 
@@ -44,14 +45,14 @@ public class AnimatedSprite extends Entity {
         game.batch.draw(currentFrame, x, y);
     }
 
-    public void setCurrentDirection(final Person.Facing direction) {
-        if (direction == Person.Facing.LEFT) {
+    public void setCurrentDirection(final Facing direction) {
+        if (direction == Facing.LEFT) {
             currentWalking = leftWalking;
-        } else if (direction == Person.Facing.RIGHT) {
+        } else if (direction == Facing.RIGHT) {
             currentWalking = rightWalking;
-        } else if (direction == Person.Facing.UP) {
+        } else if (direction == Facing.UP) {
             currentWalking = upWalking;
-        } else if (direction == Person.Facing.DOWN) {
+        } else if (direction == Facing.DOWN) {
             currentWalking = downWalking;
         }
     }
