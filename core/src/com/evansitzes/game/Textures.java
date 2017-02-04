@@ -13,6 +13,7 @@ public class Textures {
         public static final TextureRegion BACKGROUND = loadBackground();
         public static final TextureRegion HOUSE = loadHouse();
         public static final TextureRegion GUARD_HOUSE = loadGuardhouse();
+        public static final TextureRegion FARMHOUSE = loadFarmhouse();
         public static final TextureRegion BULLDOZER = loadBulldozer();
 
     }
@@ -72,6 +73,28 @@ public class Textures {
 
     }
 
+    public static class Crops {
+        public static final TextureRegion GROUND = loadGround()[0][0];
+
+        public static final TextureRegion CARROTS_IN_GROUND = loadCarrot()[0][0];
+        public static final TextureRegion CARROTS_RIPE = loadCarrot()[1][0];
+        public static final TextureRegion CARROTS = loadCarrot()[2][0];
+
+        private static TextureRegion[][] loadCarrot() {
+            final int frameColumns = 1;
+            final int frameRows = 3;
+
+            return splitTextureRegion(frameColumns, frameRows, new Texture(Gdx.files.internal("buildings/crops/carrots.png")));
+        }
+
+        private static TextureRegion[][] loadGround() {
+            final int frameColumns = 1;
+            final int frameRows = 1;
+
+            return splitTextureRegion(frameColumns, frameRows, new Texture(Gdx.files.internal("buildings/crops/ground.png")));
+        }
+    }
+
     public static class Road {
         public static final TextureRegion VERTICLE_ROAD = loadRoad()[3][5];
         public static final TextureRegion HORIZONTAL_ROAD = loadRoad()[0][0];
@@ -110,6 +133,13 @@ public class Textures {
         final int frameRows = 1;
 
         return splitTextureRegion(frameColumns, frameRows, new Texture(Gdx.files.internal("buildings/house.png")))[0][0];
+    }
+
+    private static TextureRegion loadFarmhouse() {
+        final int frameColumns = 1;
+        final int frameRows = 1;
+
+        return splitTextureRegion(frameColumns, frameRows, new Texture(Gdx.files.internal("buildings/farmhouse.png")))[0][0];
     }
 
     private static TextureRegion loadGuardhouse() {

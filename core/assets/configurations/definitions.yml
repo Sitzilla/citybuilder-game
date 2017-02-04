@@ -6,6 +6,12 @@ definitions:
   description: "A basic house. People living here have the bare minimum needs."
   tile_size: 2
   max_employees: 0
+- name: "farmhouse"
+  pretty_name: "Farm"
+  type: "farmhouse"
+  description: "A local farm. Farmers are busy out gathering organic produce."
+  tile_size: 3
+  max_employees: 6
 - name: "guard_house"
   pretty_name: "City Guard Barracks"
   type: "employableBuilding"

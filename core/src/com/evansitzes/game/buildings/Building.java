@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.evansitzes.game.CityBuildingGame;
 import com.evansitzes.game.Textures;
+import com.evansitzes.game.Textures.Sidebar;
 
 /**
  * Created by evan on 12/14/16.
@@ -39,7 +40,7 @@ public class Building {
         //TODO this is implemented terribly
         if (type.equals("house")) {
             this.buildingType = BuildingType.RESIDENTIAL;
-        } else if (type.equals("employableBuilding")) {
+        } else if (type.equals("employableBuilding") || type.equals("farmhouse")) {
             this.buildingType = BuildingType.EMPLOYABLE;
         } else {
             this.buildingType = BuildingType.OTHER;
@@ -54,15 +55,19 @@ public class Building {
     //TODO replace this with some kind of configuration lookup
     private TextureRegion getBuildingSprite(final String type) {
         if (type.equals("house")) {
-            return Textures.Sidebar.HOUSE;
+            return Sidebar.HOUSE;
         }
 
         if (type.equals("road")) {
             return Textures.Road.VERTICLE_ROAD;
         }
 
+        if (type.equals("farmhouse")) {
+            return Sidebar.FARMHOUSE;
+        }
+
         if (type.equals("employableBuilding")) {
-            return Textures.Sidebar.GUARD_HOUSE;
+            return Sidebar.GUARD_HOUSE;
         }
 
         //TODO should throw an error

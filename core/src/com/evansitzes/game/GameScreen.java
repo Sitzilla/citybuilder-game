@@ -3,8 +3,11 @@ package com.evansitzes.game;
 import com.badlogic.gdx.*;
 import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.Input.Keys;
-import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.Cursor.SystemCursor;
+import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.tiled.TiledMap;
@@ -17,6 +20,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.evansitzes.game.Textures.Colors;
 import com.evansitzes.game.Textures.Sidebar;
 import com.evansitzes.game.buildings.Building;
 import com.evansitzes.game.buildings.EmployableBuilding;
@@ -85,6 +89,7 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
     private Stage stage;
     Label fpsLabel;
 
+    // Button/Image states?
     private boolean buildingSelected;
     private boolean bulldozingEnabled;
     private Building selectedBuilding;
@@ -144,7 +149,7 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
         this.tiledMapRenderer = new OrthogonalTiledMapRenderer(level.map);
         tiledMapRenderer.setView(camera);
 
-        border = new NinePatch(Textures.Colors.RED, 0, 0, 0, 0);
+        border = new NinePatch(Colors.RED, 0, 0, 0, 0);
 
         sidebar = Sidebar.BACKGROUND;
         sidebarDrawable = new TextureRegionDrawable(sidebar);
@@ -155,6 +160,7 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
         final Button guardHouseButton = new Button(new Image(Sidebar.GUARD_HOUSE), skin);
         final Button roadButton = new Button(new Image(Textures.Road.VERTICLE_ROAD), skin);
         final Button bulldozeButton = new Button(new Image(Sidebar.BULLDOZER), skin);
+        final Button farmhouseButton = new Button(new Image(Sidebar.FARMHOUSE), skin);
 
         houseButton.addListener(new ClickListener() {
             @Override
@@ -174,6 +180,15 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
             }
         });
 
+        farmhouseButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(final InputEvent event, final float x, final float y) {
+                selectedBuilding = createGenericBuilding(game, "farmhouse");
+                buildingSelected = true;
+                bulldozingEnabled = false;
+            }
+        });
+
         roadButton.addListener(new ClickListener() {
             @Override
             public void clicked(final InputEvent event, final float x, final float y) {
@@ -182,6 +197,8 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
                 bulldozingEnabled = false;
             }
         });
+
+
 
         saveButton.addListener(new ClickListener() {
             @Override
@@ -213,6 +230,8 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
         sidebarTable.add(roadButton);
         sidebarTable.add(saveButton);
         sidebarTable.add(bulldozeButton);
+        sidebarTable.row();
+        sidebarTable.add(farmhouseButton);
 
         entireScreenTable.setDebug(true); // turn on all debug lines (table, cell, and widget)
         entireScreenTable.setHeight(Gdx.graphics.getHeight());
@@ -463,6 +482,17 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
                     buildings.add(building);
                     employableBuildings.add(building);
                     setTileBuilding(building, currentTile);
+                } else if (selectedBuilding.name.equals("farmhouse")) {
+                    final EmployableBuilding building = new EmployableBuilding(game, selectedBuilding.tileSize, buildingDefinition.getType());
+                    building.name = buildingDefinition.getName();
+                    building.prettyName = buildingDefinition.getPrettyName();
+                    building.description = buildingDefinition.getDescription();
+                    building.maxEmployability = buildingDefinition.getMaxEmployees();
+                    building.x = currentTile.x;
+                    building.y = currentTile.y;
+                    buildings.add(building);
+                    employableBuildings.add(building);
+                    setTileBuilding(building, currentTile);
                 }
 ////                spriteStateHandler.refreshBuildings
 //                setTileBuilding(building, currentTile);
@@ -590,6 +620,9 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
                     roads.remove(building);
                 }
                 if (building.name.equals("guard_house")) {
+                    employableBuildings.remove(building);
+                }
+                if (building.name.equals("farmhouse")) {
                     employableBuildings.remove(building);
                 }
 
