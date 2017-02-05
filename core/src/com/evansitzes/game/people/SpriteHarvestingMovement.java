@@ -81,7 +81,7 @@ public class SpriteHarvestingMovement {
 
         tilesMap.resetAllTileChecks();
         final Stack<Facing> directions = new Stack<Facing>();
-        directions.add(targetTile.getDirection());
+//        directions.add(targetTile.getDirection());
         return getPathFromTarget(targetTile, directions);
     }
 

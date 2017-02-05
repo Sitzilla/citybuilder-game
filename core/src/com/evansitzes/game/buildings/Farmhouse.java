@@ -45,6 +45,10 @@ public class Farmhouse extends EmployableBuilding {
 
     public void calculateUnworkedLand(final TilesMap tilesMap) {
 
+        if (!isConnectedToRoad) {
+            return;
+        }
+
         // Currently this logic requires that the max field distance be the same as the size of the farmhouse
         for (int i = -MAX_DISTANCE_FOR_FIELDS; i < MAX_DISTANCE_FOR_FIELDS + tileSize; i++) {
             for (int j = -MAX_DISTANCE_FOR_FIELDS; j < MAX_DISTANCE_FOR_FIELDS + tileSize; j++) {

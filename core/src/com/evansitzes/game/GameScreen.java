@@ -153,6 +153,8 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
             building.isConnectedToRoad = BuildingHelper.isBuildingConnectedToRoad(building, tilesMap);
         }
 
+        calculateFarmland();
+
         this.tiledMapRenderer = new OrthogonalTiledMapRenderer(level.map);
         tiledMapRenderer.setView(camera);
 
@@ -516,11 +518,11 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
                     building.x = currentTile.x;
                     building.y = currentTile.y;
                     building.isConnectedToRoad = BuildingHelper.isBuildingConnectedToRoad(building, tilesMap);
-                    building.calculateUnworkedLand(tilesMap);
                     buildings.add(building);
                     employableBuildings.add(building);
                     farmhouses.add(building);
                     setTileBuilding(building, currentTile);
+                    building.calculateUnworkedLand(tilesMap);
                 }
 ////                spriteStateHandler.refreshBuildings
 //                setTileBuilding(building, currentTile);
@@ -742,6 +744,16 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
         return false;
     }
 
+    // TODO this will go away when farmland is less loosly tied to a farm
+    private void calculateFarmland() {
+        for (final Building building : buildings) {
+            if (building instanceof Farmhouse) {
+                ((Farmhouse) building).calculateUnworkedLand(tilesMap);
+                continue;
+            }
+        }
+    }
+
     private void initializeBuildingArrays() {
         // Split buildings into building types
         for (final Building building : buildings) {
@@ -754,7 +766,6 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
                 continue;
             }
             if (building instanceof Farmhouse) {
-                ((Farmhouse) building).calculateUnworkedLand(tilesMap);
                 farmhouses.add((Farmhouse) building);
                 employableBuildings.add((EmployableBuilding) building);
                 continue;

@@ -16,6 +16,10 @@ public class Farmer extends PatrolPerson {
     public float maxWorkingTime;
     public float currentWorkingTime;
 
+    // Experimental state variables
+    public boolean enteringFinalStage;
+    public boolean isInFinalSquare;
+
     public Farmer(final CityBuildingGame game, final GameScreen screen, final String name, final EmployableBuilding homeBuilding, final float maxTimeInField, final int x, final int y) {
         super(game, screen, name, homeBuilding, maxTimeInField, x, y);
         maxWorkingTime = 3;

@@ -59,6 +59,7 @@ public class Person extends Entity {
         this.state = IDLE;
         this.homeBuilding = homeBuilding;
         direction = DOWN;
+        nextDirection = new Direction();
 //        configuration = new Configuration();
 
         currentSprite = new SimpleSprite(game, Textures.People.loadStandingSprite(name));

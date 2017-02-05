@@ -63,10 +63,20 @@ public class SpriteMovementHandler {
         if (person.state == State.IDLE) {
             final Point nextPoint = person.homeFarm.getRandomUnworkedLand();
 
+            if (nextPoint.tileX > 2 && nextPoint.tileX < 6 && nextPoint.tileY > 2 && nextPoint.tileY < 6 ) {
+                System.out.println("ILLEGAL DESTINATION");
+            }
+
+            if (nextPoint.tileX == 4 && nextPoint.tileY > 5) {
+                System.out.println("ILLEGAL DESTINATION");
+            }
+
             if (nextPoint != null) {
                 person.pathHome = SpriteHarvestingMovement.getShortestPathToLand(tilesMap, person.x / TILE_SIZE, person.y / TILE_SIZE, nextPoint);
                 person.handle(delta);
                 person.state = State.WALKING;
+
+                System.out.println("Next Point: " + nextPoint);
 
                 if (!person.pathHome.isEmpty()) {
                     person.direction = person.pathHome.peek();
@@ -83,12 +93,12 @@ public class SpriteMovementHandler {
 
         if (person.state == State.WALKING) {
 
-            // If no more paths then you are done
-            if (person.pathHome.isEmpty()) {
-                person.state = State.WORKING;
-                person.handle(delta);
-                return;
-            }
+//            // If no more paths then you are done
+//            if (person.pathHome.isEmpty() && person.pathHome ) {
+//                person.state = State.WORKING;
+//                person.handle(delta);
+//                return;
+//            }
 
             // In the 'leave-square danger zone'
             if ((person.direction == UP && person.edge > person.currentTileY + TILE_SIZE - PIXELS_AWAY_FROM_EDGE_OF_TILE)
@@ -98,9 +108,7 @@ public class SpriteMovementHandler {
 
                 // No available adjacent road
                 if (person.nextDirection == null) {
-                    person.nextDirection.facingDirection = null;
                     System.out.println("No next direction!");
-                    person.state = State.WORKING;
                 }
 
                 // Keep walking straight
@@ -110,6 +118,23 @@ public class SpriteMovementHandler {
 
                     // Still in old square so keep walking straight
                     if (newTileX == person.currentTileX && newTileY == person.currentTileY) {
+
+                        if (person.enteringFinalStage && person.isInFinalSquare) {
+                            person.handle(delta);
+                            person.state = State.WORKING;
+                            person.enteringFinalStage = false;
+                            person.isInFinalSquare = false;
+                            return;
+                        }
+
+                        if (person.pathHome.isEmpty()) {
+    //                        person.state = State.IDLE;
+                            person.handle(delta);
+                            person.state = State.WALKING;
+                            person.enteringFinalStage = true;
+                            return;
+                        }
+
                         person.state = State.WALKING;
                         person.handle(delta);
                         person.state = State.WALKING;
@@ -120,16 +145,14 @@ public class SpriteMovementHandler {
                     person.currentTileX = getXCornerTileFromMiddleArea(person.x, TILE_SIZE);
                     person.currentTileY = getYCornerTileFromMiddleArea(person.y, TILE_SIZE);
 
-                    if (person.pathHome.isEmpty()) {
-                        person.nextDirection.facingDirection = null;
-//                        person.state = State.WORKING;
-                        person.handle(delta);
-                        person.state = State.WORKING;
-                        return;
+                    if (person.enteringFinalStage) {
+                        person.isInFinalSquare = true;
                     }
 
-                    person.nextDirection.facingDirection = person.pathHome.pop();
-//                    person.state = State.WALKING;
+                    if (!person.pathHome.isEmpty()) {
+                        person.nextDirection.facingDirection = person.pathHome.pop();
+                    }
+                    person.state = State.WALKING;
                     person.handle(delta);
                     person.state = State.WALKING;
                     return;
@@ -138,15 +161,6 @@ public class SpriteMovementHandler {
 
                 // Start walking a new direction
                 person.direction = person.nextDirection.facingDirection;
-                if (person.pathHome.isEmpty()) {
-                    person.nextDirection.facingDirection = null;
-//                    person.state = State.IDLE;
-                    person.handle(delta);
-                    person.state = State.WORKING;
-                    return;
-                }
-
-                person.nextDirection.facingDirection = person.pathHome.pop();
                 person.state = State.WALKING;
                 person.handle(delta);
                 person.state = State.WALKING;

@@ -11,6 +11,9 @@ public class Direction {
     public int directionIndex;
     public Facing facingDirection;
 
+    public Direction() {
+    }
+
     public Direction(final int directionIndex, final Facing facingDirection) {
         this.directionIndex = directionIndex;
         this.facingDirection = facingDirection;
