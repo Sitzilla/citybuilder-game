@@ -2,10 +2,7 @@ package com.evansitzes.game.state;
 
 import com.badlogic.gdx.Gdx;
 import com.evansitzes.game.CityBuildingGame;
-import com.evansitzes.game.buildings.Building;
-import com.evansitzes.game.buildings.EmployableBuilding;
-import com.evansitzes.game.buildings.House;
-import com.evansitzes.game.buildings.Road;
+import com.evansitzes.game.buildings.*;
 import com.evansitzes.game.environment.EnhancedTile;
 import com.evansitzes.game.environment.TilesMap;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -17,6 +14,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -24,7 +22,7 @@ import java.util.Map;
  */
 public class SaveStateHelper {
 
-    public static ArrayList<Building> loadBuildingsState(final CityBuildingGame game, final Map<String, Definition> definitions) {
+    public static List<Building> loadBuildingsState(final CityBuildingGame game, final Map<String, Definition> definitions, final int mapTileSize) {
         final ObjectMapper mapper = new ObjectMapper(new YAMLFactory()); // jackson databind
         mapper.registerModule(new JodaModule());
 
@@ -32,7 +30,7 @@ public class SaveStateHelper {
             final File file = new File(String.valueOf(Gdx.files.local("state/structures.yml")));
 
             final StructuresEnvelope structuresEnvelope = mapper.readValue(file, StructuresEnvelope.class);
-            final ArrayList<Building> buildings = new ArrayList<Building>();
+            final List<Building> buildings = new ArrayList<Building>();
 
             // If no structures then return an empty list
             if (structuresEnvelope.getStructures() == null) {
@@ -46,6 +44,8 @@ public class SaveStateHelper {
 
                 if (buildingDefinition.getType().equals("house")) {
                     building = buildHouse(game, structure, buildingDefinition);
+                } else if (buildingDefinition.getType().equals("farmhouse")) {
+                    building = buildFarmhouse(game, structure, buildingDefinition, mapTileSize);
                 } else if (buildingDefinition.getType().equals("employableBuilding")) {
                     building = buildEmployableBuilding(game, structure, buildingDefinition);
                 } else if (buildingDefinition.getType().equals("road")) {
@@ -74,13 +74,19 @@ public class SaveStateHelper {
         return new House(game, structure.getTileSize(), definition.getType());
     }
 
+    private static Farmhouse buildFarmhouse(final CityBuildingGame game, final Structure structure, final Definition definition, final int mapTileSize) {
+        final Farmhouse building = new Farmhouse(game, structure.getTileSize(), definition.getType(), mapTileSize);
+        building.maxEmployability = definition.getMaxEmployees();
+        return building;
+    }
+
     private static EmployableBuilding buildEmployableBuilding(final CityBuildingGame game, final Structure structure, final Definition definition) {
         final EmployableBuilding building = new EmployableBuilding(game, structure.getTileSize(), definition.getType());
         building.maxEmployability = definition.getMaxEmployees();
         return building;
     }
 
-    public static void saveBuildingsState(final ArrayList<Building> buildings) {
+    public static void saveBuildingsState(final List<Building> buildings) {
         final ObjectMapper mapper = new ObjectMapper(new YAMLFactory()); // jackson databind
         mapper.registerModule(new JodaModule());
 
@@ -88,7 +94,7 @@ public class SaveStateHelper {
             final File file = new File(String.valueOf(Gdx.files.local("state/structures.yml")));
 //            final StructuresEnvelope structuresEnvelope = mapper.readValue(file, StructuresEnvelope.class);
             final StructuresEnvelope structuresEnvelope = new StructuresEnvelope();
-            final ArrayList<Structure> structures = new ArrayList<Structure>();
+            final List<Structure> structures = new ArrayList<Structure>();
             structuresEnvelope.setStructures(structures);
 
             for (final Building building : buildings) {
@@ -107,7 +113,7 @@ public class SaveStateHelper {
         }
     }
 
-    public static TilesMap loadTilesState(final float mapWidth, final float mapHeight, final int tileHeight, final int tileWidth, final ArrayList<Building> buildings) {
+    public static TilesMap loadTilesState(final float mapWidth, final float mapHeight, final int tileHeight, final int tileWidth, final List<Building> buildings) {
         final ObjectMapper mapper = new ObjectMapper(new YAMLFactory()); // jackson databind
         mapper.registerModule(new JodaModule());
 
@@ -123,7 +129,7 @@ public class SaveStateHelper {
             }
 
             // Change all Tiles objects to EnhancedTile objects
-            final ArrayList<EnhancedTile> enhancedTiles = new ArrayList<EnhancedTile>();
+            final List<EnhancedTile> enhancedTiles = new ArrayList<EnhancedTile>();
             for (final Tile tile : tilesEnvelope.getTiles()) {
                 enhancedTiles.add(new EnhancedTile(tile));
             }

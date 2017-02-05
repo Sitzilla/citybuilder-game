@@ -22,10 +22,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.evansitzes.game.Textures.Colors;
 import com.evansitzes.game.Textures.Sidebar;
-import com.evansitzes.game.buildings.Building;
-import com.evansitzes.game.buildings.EmployableBuilding;
-import com.evansitzes.game.buildings.House;
-import com.evansitzes.game.buildings.Road;
+import com.evansitzes.game.buildings.*;
 import com.evansitzes.game.environment.EnhancedTile;
 import com.evansitzes.game.environment.Level;
 import com.evansitzes.game.environment.TilesMap;
@@ -37,10 +34,12 @@ import com.evansitzes.game.people.SpriteGenerator;
 import com.evansitzes.game.people.SpriteHelper;
 import com.evansitzes.game.people.SpriteMovementHandler;
 import com.evansitzes.game.people.SpriteShortestPathFinder;
+import com.evansitzes.game.people.sprites.Farmer;
 import com.evansitzes.game.people.sprites.Person;
 import com.evansitzes.game.state.Definition;
 import com.evansitzes.game.state.SaveStateHelper;
 import com.evansitzes.game.state.handlers.EmploymentStateHandler;
+import com.evansitzes.game.state.handlers.FarmsStateHandler;
 import com.evansitzes.game.state.handlers.PopulationStateHandler;
 import com.evansitzes.game.state.handlers.SpriteStateHandler;
 
@@ -98,10 +97,11 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
 //    private int currentImageTilesize;
 //    private TextureRegionDrawable selectedBuildingImage;
 
-    private final ArrayList<Building> buildings;
-    private final ArrayList<House> houses;
-    private final ArrayList<Road> roads;
-    private final ArrayList<EmployableBuilding> employableBuildings;
+    private final List<Building> buildings;
+    private final List<House> houses;
+    private final List<Road> roads;
+    private final List<Farmhouse> farmhouses;
+    private final List<EmployableBuilding> employableBuildings;
     private final Map<String, Definition> objectDefinitions;
 
     private final CityBuildingGame game;
@@ -111,6 +111,7 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
     private final SpriteMovementHandler spriteMovementHandler;
     private final PopulationStateHandler populationStateHandler;
     private final EmploymentStateHandler employmentStateHandler;
+    private final FarmsStateHandler farmsStateHandler;
     private final BuildingHelper buildingHelper;
 
     private List<Point> draggedPoints = new ArrayList<Point>();
@@ -138,10 +139,11 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
         // Load State
         objectDefinitions = SaveStateHelper.loadObjectDefinitions();
         buildingHelper = new BuildingHelper(objectDefinitions, TILE_SIZE);
-        buildings = SaveStateHelper.loadBuildingsState(game, objectDefinitions);
+        buildings = SaveStateHelper.loadBuildingsState(game, objectDefinitions, TILE_SIZE);
         tilesMap = SaveStateHelper.loadTilesState(level.mapWidth, level.mapHeight, level.tileHeight, level.tileWidth, buildings);
         houses = new ArrayList<House>();
         roads = new ArrayList<Road>();
+        farmhouses = new ArrayList<Farmhouse>();
         employableBuildings = new ArrayList<EmployableBuilding>();
         selectedBuilding = createBlankBuilding(game);
         initializeBuildingArrays();
@@ -270,6 +272,7 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
 
         populationStateHandler = new PopulationStateHandler(houses);
         employmentStateHandler = new EmploymentStateHandler(employableBuildings);
+        farmsStateHandler = new FarmsStateHandler(game, farmhouses, this);
     }
 
     @Override
@@ -342,10 +345,15 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
             building.draw();
         }
 
+        for (final Farmhouse farmhouse : farmhouses) {
+            farmhouse.drawFields();
+        }
+
         // Handle Sprites
         spriteStateHandler.handleSpritesStates(delta);
         spriteMovementHandler.handlePatrollingSprites(delta, spriteStateHandler.getPatrollingPersons());
         spriteMovementHandler.handleReturningHomeSprites(delta, spriteStateHandler.getReturningHomePersons());
+        spriteMovementHandler.handleHarvestingSprites(delta, spriteStateHandler.getHarvestingPersons());
 
         // Handle Population
         populationStateHandler.handlePopulationState(delta);
@@ -354,6 +362,9 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
 
         // Handle Employment
         employmentStateHandler.handleEmploymentState(delta, populationStateHandler.totalPopulation);
+
+        // Handle Farms
+        farmsStateHandler.handleFarms(delta);
 
         game.batch.end();
 
@@ -497,7 +508,7 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
                     employableBuildings.add(building);
                     setTileBuilding(building, currentTile);
                 } else if (selectedBuilding.name.equals("farmhouse")) {
-                    final EmployableBuilding building = new EmployableBuilding(game, selectedBuilding.tileSize, buildingDefinition.getType());
+                    final Farmhouse building = new Farmhouse(game, selectedBuilding.tileSize, buildingDefinition.getType(), TILE_SIZE);
                     building.name = buildingDefinition.getName();
                     building.prettyName = buildingDefinition.getPrettyName();
                     building.description = buildingDefinition.getDescription();
@@ -505,8 +516,10 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
                     building.x = currentTile.x;
                     building.y = currentTile.y;
                     building.isConnectedToRoad = BuildingHelper.isBuildingConnectedToRoad(building, tilesMap);
+                    building.calculateUnworkedLand(tilesMap);
                     buildings.add(building);
                     employableBuildings.add(building);
+                    farmhouses.add(building);
                     setTileBuilding(building, currentTile);
                 }
 ////                spriteStateHandler.refreshBuildings
@@ -603,6 +616,26 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
             return;
         }
 
+        // TODO need this really be separated out?
+        if (name.equals("farmer")) {
+
+            final Farmer newPerson = SpriteGenerator.generateFarmer(game,
+                    this,
+                    building,
+                    TILE_SIZE,
+                    tilesMap,
+                    name,
+                    getNextXCornerTileFromDirection(x, TILE_SIZE, building.tileSize, direction.directionIndex, direction.facingDirection),
+                    getNextYCornerTileFromDirection(y, TILE_SIZE, building.tileSize, direction.directionIndex, direction.facingDirection));
+
+            if (newPerson == null) {
+                return;
+            }
+
+            spriteStateHandler.addFarmerToList(newPerson);
+            return;
+        }
+
         final Person newPerson = SpriteGenerator.generatePerson(game,
                 this,
                 building,
@@ -642,6 +675,7 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
                     employableBuildings.remove(building);
                 }
                 if (building.name.equals("farmhouse")) {
+                    farmhouses.remove(building);
                     employableBuildings.remove(building);
                 }
 
@@ -717,6 +751,12 @@ public class GameScreen extends ApplicationAdapter implements Screen, InputProce
             }
             if (building instanceof Road) {
                 roads.add((Road) building);
+                continue;
+            }
+            if (building instanceof Farmhouse) {
+                ((Farmhouse) building).calculateUnworkedLand(tilesMap);
+                farmhouses.add((Farmhouse) building);
+                employableBuildings.add((EmployableBuilding) building);
                 continue;
             }
             if (building instanceof EmployableBuilding) {

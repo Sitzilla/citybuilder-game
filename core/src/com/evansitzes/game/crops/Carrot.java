@@ -2,6 +2,7 @@ package com.evansitzes.game.crops;
 
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.evansitzes.game.CityBuildingGame;
 import com.evansitzes.game.Textures.Crops;
 
 /**
@@ -9,7 +10,8 @@ import com.evansitzes.game.Textures.Crops;
  */
 public class Carrot extends Crop {
 
-    public Carrot() {
+    public Carrot(final CityBuildingGame game) {
+        super(game);
         this.image = new TextureRegionDrawable(Crops.CARROTS_IN_GROUND);
         this.sprite = new Sprite(Crops.CARROTS_IN_GROUND);
     }

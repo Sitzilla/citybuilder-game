@@ -2,7 +2,7 @@ package com.evansitzes.game.state.handlers;
 
 import com.evansitzes.game.buildings.EmployableBuilding;
 
-import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by evan on 1/14/17.
@@ -16,9 +16,9 @@ public class EmploymentStateHandler {
     public int maxEmployable;
     public int totalLaborForce;
 
-    final ArrayList<EmployableBuilding> buildings;
+    final List<EmployableBuilding> buildings;
 
-    public EmploymentStateHandler(final ArrayList<EmployableBuilding> buildings) {
+    public EmploymentStateHandler(final List<EmployableBuilding> buildings) {
         this.buildings = buildings;
     }
 
@@ -47,7 +47,6 @@ public class EmploymentStateHandler {
                 newEmployed += building.currentlyEmployed;
                 newMaxEmployed += building.maxEmployability;
             }
-            System.out.println("---------------");
             time = 0;
             totalEmployed = newEmployed;
             maxEmployable = newMaxEmployed;

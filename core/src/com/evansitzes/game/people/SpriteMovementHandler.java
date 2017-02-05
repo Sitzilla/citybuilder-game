@@ -2,12 +2,15 @@ package com.evansitzes.game.people;
 
 import com.evansitzes.game.CityBuildingGame;
 import com.evansitzes.game.environment.TilesMap;
+import com.evansitzes.game.helpers.Direction;
+import com.evansitzes.game.helpers.Point;
+import com.evansitzes.game.people.sprites.Farmer;
 import com.evansitzes.game.people.sprites.PatrolPerson;
 import com.evansitzes.game.people.sprites.Person;
 import com.evansitzes.game.people.sprites.Person.Facing;
 import com.evansitzes.game.people.sprites.Person.State;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import static com.evansitzes.game.people.SpriteHelper.*;
 import static com.evansitzes.game.people.sprites.Person.Facing.*;
@@ -29,16 +32,133 @@ public class SpriteMovementHandler {
         this.tilesMap = tilesMap;
     }
 
-    public void handlePatrollingSprites(final float delta, final ArrayList<PatrolPerson> persons) {
+    public void handlePatrollingSprites(final float delta, final List<PatrolPerson> persons) {
         for (final Person person : persons) {
             handlePatrollingSprite(person, delta);
         }
     }
 
-    public void handleReturningHomeSprites(final float delta, final ArrayList<Person> persons) {
+    public void handleReturningHomeSprites(final float delta, final List<Person> persons) {
         for (final Person person : persons) {
             handleReturningHomeSprite(person, delta);
         }
+    }
+
+
+    public void handleHarvestingSprites(final float delta, final List<Farmer> persons) {
+        for (final Farmer person : persons) {
+            handleHarvestingSprite(person, delta);
+        }
+    }
+
+    private void handleHarvestingSprite(final Farmer person, final float delta) {
+
+        // keep where she is and keep tilling
+        if (person.state == State.WORKING) {
+            person.handle(delta);
+            return;
+        }
+
+        // Get next closest unworked patch
+        if (person.state == State.IDLE) {
+            final Point nextPoint = person.homeFarm.getRandomUnworkedLand();
+
+            if (nextPoint != null) {
+                person.pathHome = SpriteHarvestingMovement.getShortestPathToLand(tilesMap, person.x / TILE_SIZE, person.y / TILE_SIZE, nextPoint);
+                person.handle(delta);
+                person.state = State.WALKING;
+
+                if (!person.pathHome.isEmpty()) {
+                    person.direction = person.pathHome.peek();
+//                    if (!person.pathHome.isEmpty()) {
+                    person.nextDirection = new Direction(1, person.pathHome.pop());
+//                    }
+                }
+                return;
+            }
+
+            person.handle(delta);
+            return;
+        }
+
+        if (person.state == State.WALKING) {
+
+            // If no more paths then you are done
+            if (person.pathHome.isEmpty()) {
+                person.state = State.WORKING;
+                person.handle(delta);
+                return;
+            }
+
+            // In the 'leave-square danger zone'
+            if ((person.direction == UP && person.edge > person.currentTileY + TILE_SIZE - PIXELS_AWAY_FROM_EDGE_OF_TILE)
+                    || (person.direction == DOWN && person.edge < person.currentTileY + PIXELS_AWAY_FROM_EDGE_OF_TILE)
+                    || (person.direction == RIGHT && person.edge > person.currentTileX + TILE_SIZE - PIXELS_AWAY_FROM_EDGE_OF_TILE)
+                    || (person.direction == LEFT && person.edge < person.currentTileX + PIXELS_AWAY_FROM_EDGE_OF_TILE)) {
+
+                // No available adjacent road
+                if (person.nextDirection == null) {
+                    person.nextDirection.facingDirection = null;
+                    System.out.println("No next direction!");
+                    person.state = State.WORKING;
+                }
+
+                // Keep walking straight
+                if (person.nextDirection.facingDirection == person.direction) {
+                    final int newTileX = getXCornerTileFromMiddleArea(person.x, TILE_SIZE);
+                    final int newTileY = getYCornerTileFromMiddleArea(person.y, TILE_SIZE);
+
+                    // Still in old square so keep walking straight
+                    if (newTileX == person.currentTileX && newTileY == person.currentTileY) {
+                        person.state = State.WALKING;
+                        person.handle(delta);
+                        person.state = State.WALKING;
+                        return;
+                    }
+
+                    // Entering new square. Keep walking straight but assign next direction
+                    person.currentTileX = getXCornerTileFromMiddleArea(person.x, TILE_SIZE);
+                    person.currentTileY = getYCornerTileFromMiddleArea(person.y, TILE_SIZE);
+
+                    if (person.pathHome.isEmpty()) {
+                        person.nextDirection.facingDirection = null;
+//                        person.state = State.WORKING;
+                        person.handle(delta);
+                        person.state = State.WORKING;
+                        return;
+                    }
+
+                    person.nextDirection.facingDirection = person.pathHome.pop();
+//                    person.state = State.WALKING;
+                    person.handle(delta);
+                    person.state = State.WALKING;
+                    return;
+
+                }
+
+                // Start walking a new direction
+                person.direction = person.nextDirection.facingDirection;
+                if (person.pathHome.isEmpty()) {
+                    person.nextDirection.facingDirection = null;
+//                    person.state = State.IDLE;
+                    person.handle(delta);
+                    person.state = State.WORKING;
+                    return;
+                }
+
+                person.nextDirection.facingDirection = person.pathHome.pop();
+                person.state = State.WALKING;
+                person.handle(delta);
+                person.state = State.WALKING;
+                return;
+            }
+
+            // Default: keep walking straight
+            person.handle(delta);
+            person.state = State.WALKING;
+
+        }
+
     }
 
     //TODO check for null
@@ -249,4 +369,5 @@ public class SpriteMovementHandler {
     public void setTilesMap(final TilesMap tilesMap) {
         this.tilesMap = tilesMap;
     }
+
 }

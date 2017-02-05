@@ -33,7 +33,7 @@ public class EmployableBuilding extends Building {
             currentlyEmployed = amountToEmploy;
         }
 
-        System.out.println("Currently Employed: " + currentlyEmployed);
+//        System.out.println("Currently Employed: " + currentlyEmployed);
         // TODO dont hardcode this
         if (time > TIME_UNTIL_BUILDING_UPDATE) {
             if (currentlyEmployed < 4) {

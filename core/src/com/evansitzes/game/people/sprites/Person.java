@@ -13,6 +13,7 @@ import java.util.Stack;
 import static com.evansitzes.game.people.sprites.Person.Facing.DOWN;
 import static com.evansitzes.game.people.sprites.Person.Facing.RIGHT;
 import static com.evansitzes.game.people.sprites.Person.State.IDLE;
+import static com.evansitzes.game.people.sprites.Person.State.WORKING;
 
 /**
  * Created by evan on 12/29/16.
@@ -41,7 +42,7 @@ public class Person extends Entity {
     public boolean justBeganReturningHome;
 
     public enum State {
-        IDLE, WALKING
+        IDLE, WALKING, WORKING
     }
 
     public enum Facing {
@@ -83,7 +84,7 @@ public class Person extends Entity {
         // handle motion
         handleInput(delta);
 
-        if (state == IDLE) {
+        if (state == IDLE || state == WORKING) {
             currentSprite.handle(delta);
         }
         else if (state == State.WALKING) {

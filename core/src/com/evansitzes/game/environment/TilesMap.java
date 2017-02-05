@@ -4,6 +4,7 @@ import com.evansitzes.game.buildings.Building;
 import com.evansitzes.game.state.Tile;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by evan on 12/27/16.
@@ -11,10 +12,10 @@ import java.util.ArrayList;
 public class TilesMap {
 
     //TODO  why in the world is this not just a 2D array??
-    private ArrayList<ArrayList<EnhancedTile>> xTiles = new ArrayList<ArrayList<EnhancedTile>>();
+    private List<ArrayList<EnhancedTile>> xTiles = new ArrayList<ArrayList<EnhancedTile>>();
 
     // Create new Tile Map from flattened list of tiles
-    public TilesMap(final ArrayList<EnhancedTile> flattenedTiles, final float mapDimensionsX, final float mapDimensionsY, final int tileHeight, final int tileWidth) {
+    public TilesMap(final List<EnhancedTile> flattenedTiles, final float mapDimensionsX, final float mapDimensionsY, final int tileHeight, final int tileWidth) {
         int counter = 0;
 
         for (int i = 0; i < mapDimensionsX / tileWidth; i++) {
@@ -55,8 +56,8 @@ public class TilesMap {
         }
     }
 
-    public ArrayList<Tile> getFlattenedTiles() {
-        final ArrayList<Tile> flattenedTiles = new ArrayList<Tile>();
+    public List<Tile> getFlattenedTiles() {
+        final List<Tile> flattenedTiles = new ArrayList<Tile>();
 
         for (int i = 0; i < xTiles.size(); i++) {
 
@@ -72,7 +73,7 @@ public class TilesMap {
     }
 
     //TODO measure how long this takes
-    public void addAllBuildings(final ArrayList<Building> buildings) {
+    public void addAllBuildings(final List<Building> buildings) {
 
         if (buildings.size() == 0) {
             return;

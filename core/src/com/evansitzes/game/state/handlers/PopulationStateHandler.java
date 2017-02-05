@@ -2,7 +2,7 @@ package com.evansitzes.game.state.handlers;
 
 import com.evansitzes.game.buildings.House;
 
-import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by evan on 1/11/17.
@@ -12,9 +12,9 @@ public class PopulationStateHandler {
     float time;
     public int totalPopulation;
 
-    final ArrayList<House> houses;
+    final List<House> houses;
 
-    public PopulationStateHandler(final ArrayList<House> houses) {
+    public PopulationStateHandler(final List<House> houses) {
         this.houses = houses;
     }
 
