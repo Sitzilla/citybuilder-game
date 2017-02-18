@@ -63,20 +63,10 @@ public class SpriteMovementHandler {
         if (person.state == State.IDLE) {
             final Point nextPoint = person.homeFarm.getRandomUnworkedLand();
 
-            if (nextPoint.tileX > 2 && nextPoint.tileX < 6 && nextPoint.tileY > 2 && nextPoint.tileY < 6 ) {
-                System.out.println("ILLEGAL DESTINATION");
-            }
-
-            if (nextPoint.tileX == 4 && nextPoint.tileY > 5) {
-                System.out.println("ILLEGAL DESTINATION");
-            }
-
             if (nextPoint != null) {
                 person.pathHome = SpriteHarvestingMovement.getShortestPathToLand(tilesMap, person.x / TILE_SIZE, person.y / TILE_SIZE, nextPoint);
                 person.handle(delta);
                 person.state = State.WALKING;
-
-                System.out.println("Next Point: " + nextPoint);
 
                 if (!person.pathHome.isEmpty()) {
                     person.direction = person.pathHome.peek();
@@ -93,23 +83,11 @@ public class SpriteMovementHandler {
 
         if (person.state == State.WALKING) {
 
-//            // If no more paths then you are done
-//            if (person.pathHome.isEmpty() && person.pathHome ) {
-//                person.state = State.WORKING;
-//                person.handle(delta);
-//                return;
-//            }
-
             // In the 'leave-square danger zone'
             if ((person.direction == UP && person.edge > person.currentTileY + TILE_SIZE - PIXELS_AWAY_FROM_EDGE_OF_TILE)
                     || (person.direction == DOWN && person.edge < person.currentTileY + PIXELS_AWAY_FROM_EDGE_OF_TILE)
                     || (person.direction == RIGHT && person.edge > person.currentTileX + TILE_SIZE - PIXELS_AWAY_FROM_EDGE_OF_TILE)
                     || (person.direction == LEFT && person.edge < person.currentTileX + PIXELS_AWAY_FROM_EDGE_OF_TILE)) {
-
-                // No available adjacent road
-                if (person.nextDirection == null) {
-                    System.out.println("No next direction!");
-                }
 
                 // Keep walking straight
                 if (person.nextDirection.facingDirection == person.direction) {
@@ -128,7 +106,6 @@ public class SpriteMovementHandler {
                         }
 
                         if (person.pathHome.isEmpty()) {
-    //                        person.state = State.IDLE;
                             person.handle(delta);
                             person.state = State.WALKING;
                             person.enteringFinalStage = true;
@@ -195,16 +172,21 @@ public class SpriteMovementHandler {
         // If just returning home then finish walking to the end of current tile
         if (person.justBeganReturningHome) {
 
-            if (person.direction == UP && person.pathHome.peek() != UP) {
-                person.direction = DOWN;
-                person.nextDirection.facingDirection = person.pathHome.pop();
-            } else if (person.direction == RIGHT && person.pathHome.peek() != RIGHT) {
-                person.direction = LEFT;
-                person.nextDirection.facingDirection = person.pathHome.pop();
-            } else {
-                person.direction = person.pathHome.pop();
-                person.nextDirection.facingDirection = person.direction;
+            // TODO this null catch is not a very sophisticated way to handle this
+            try {
+                if (person.direction == UP && person.pathHome.peek() != UP) {
+                    person.direction = DOWN;
+                    person.nextDirection.facingDirection = person.pathHome.pop();
+                } else if (person.direction == RIGHT && person.pathHome.peek() != RIGHT) {
+                    person.direction = LEFT;
+                    person.nextDirection.facingDirection = person.pathHome.pop();
+                } else {
+                    person.direction = person.pathHome.pop();
+                    person.nextDirection.facingDirection = person.direction;
 
+                }
+            } catch (NullPointerException e) {
+                System.out.println("Null pointer expression attempting to find next direction");
             }
 
             person.justBeganReturningHome = false;
